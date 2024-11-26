@@ -1,0 +1,53 @@
+﻿body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.card-header {
+}
+
+    .card-header h1 {
+        font-family: 'Times New Roman', Times, serif;
+        padding: 30px;
+    }
+
+
+/*Secciones*/
+.contacto-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 20px;
+}
+
+.contacto-cards {
+    display: flex;
+    flex-direction: column;
+}
+
+.contacto-card {
+    background-color: #fbfbfb;
+    padding: 20px;
+    border-radius: 5px;
+    height: 150px;
+    width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+    .contacto-card h3 {
+        font-size: 20px;
+        margin-top: 10px;
+        text-align: left;
+    }
+
+    .contacto-card p, .contacto-card h6 {
+        font-size: 14px;
+        color: #555;
+        text-align: left;
+    }
