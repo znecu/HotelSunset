@@ -1,0 +1,206 @@
+﻿
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/*Imagen principal*/
+.background-section {
+    width: 1864px;
+    height: 45vh;
+    background-image: url('/Imagenes/cama.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    padding: 0rem;
+}
+
+.text-content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 700px;
+}
+
+    .text-content h1 {
+        font-size: 5rem;
+        margin: 0 0 10px 0;
+        font-family: 'Times New Roman', Times, serif
+    }
+
+    .text-content p {
+        font-size: 1.2rem;
+        line-height: 1.5;
+    }
+
+
+/*Hotel sunset info*/
+.content-section {
+    padding: 50px 20px;
+    background-color: #ffff;
+}
+
+.content-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card-body {
+    flex: 1;
+    text-align: left;
+    padding-right: 25px;
+}
+
+    .card-body h2 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .card-body p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #333;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+.content-imagen {
+    flex: 1;
+    text-align: center;
+}
+
+    .content-imagen img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+.container-prueba {
+    background-color: #d5d5d5;
+}
+/*promo container*/
+
+.promo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+}
+
+.promo-card {
+    background-color: #4b4b4b;
+    color: white;
+    padding: 40px;
+    height: 500px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+    .promo-card h4 {
+        font-size: 1.5rem;
+        color: #dcd895;
+    }
+
+    .promo-card h2 {
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        font-size: 3rem;
+        margin-bottom: 40px;
+    }
+
+    .promo-card p {
+        font-size: 1.2rem;
+        margin-bottom: 35px;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+
+/*Servicios*/
+.container-inicio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem;
+    font-family: Arial, sans-serif;
+}
+
+.room {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.room-image {
+    max-width: 75%;
+    border-radius: 10px;
+}
+
+.features {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+    .feature i {
+        font-size: 2rem;
+        color: #bfa874;
+    }
+
+    .feature p {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+
+/*Footer*/
+
+.card-footer {
+    background-color: #907c4a;
+    color: white;
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+    margin: 0 !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.text-center h4 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    line-height: 1.8;
+}
