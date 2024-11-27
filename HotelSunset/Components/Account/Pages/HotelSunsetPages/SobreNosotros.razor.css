@@ -1,0 +1,149 @@
+﻿body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.content-section {
+    padding: 50px 20px;
+    background-color: #ffff;
+}
+
+.content-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card-body {
+    flex: 1;
+    text-align: left;
+    padding-right: 25px;
+}
+
+    .card-body h1 {
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .card-body p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #333;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+.content-imagen {
+    flex: 1;
+    text-align: center;
+}
+
+    .content-imagen img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+.text-content {
+    height: 50px;
+    background-color: #f3f3f3;
+}
+
+    .text-content h2 {
+        padding: 20px;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 35px;
+        color: black;
+    }
+
+
+/*About*/
+.about-section {
+    background-color: #f3f3f3;
+    text-align: center;
+    margin: 0 !important;
+    padding: 20px 0;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 50px;
+}
+
+    .about-section h2 {
+        margin: 0;
+        padding: 10px 0;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+.about-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 90px;
+    padding: 55px;
+}
+
+.about-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    width: 320px;
+    height: 350px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+    .about-card h3 {
+        font-size: 25px;
+        color: #000000;
+        margin-bottom: 15px;
+        font-weight: 700;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .about-card p {
+        font-size: 14.5px;
+        color: #000000;
+        line-height: 2;
+        margin: 0;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+.about-card-valores {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    width: 320px;
+    height: 350px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+    .about-card-valores h3 {
+        font-size: 25px;
+        color: #000000;
+        margin-bottom: 15px;
+        font-weight: 700;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+
+/* Footer */
+.card-footer {
+    background-color: #b6a579;
+    color: white;
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+    margin: 0 !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+    .card-footer p {
+        margin: 0;
+    }
