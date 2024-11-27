@@ -10,7 +10,7 @@ body, html {
 .background-section {
     width: 1864px;
     height: 45vh;
-    background-image: url('/Imagenes/cama.jpg');
+    background-image: url('/Imagenes/sala.jpg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -97,7 +97,8 @@ body, html {
     }
 
 .container-prueba {
-    background-color: #d5d5d5;
+    background-color: #f2f2f2;
+    padding: 35px;
 }
 /*promo container*/
 
@@ -153,7 +154,9 @@ body, html {
 }
 
 .room-image {
-    max-width: 75%;
+    margin-right: 30%;
+    margin-left: 25%;
+    max-width: 85%;
     border-radius: 10px;
 }
 
@@ -185,11 +188,72 @@ body, html {
         color: #333;
     }
 
+/*Imagen final*/
+.container-image {
+    width: 1864px;
+    height: 50vh;
+    background-image: url('/Imagenes/camadesenfoque.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+.text-content-end {
+    text-align: right;
+    margin-left: 50%;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 700px;
+    color: #f7f7f7;
+}
+    .text-content-end h2 {
+        text-align: left;
+        font-size: 55px;
+        font-family: 'Times New Roman', Times, serif;   
+        margin-bottom: 0px;
+    }
+
+    .text-content-end h4 {
+        text-align: left;
+        font-size: 30px;
+        font-family: 'Times New Roman', Times, serif;
+        margin-bottom: 35px;
+    }
+
+    .text-content-end p {
+        text-align: left;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .text-content-end h3 {
+        text-align: left;
+        font-size: 45px;
+        font-family: 'Times New Roman', Times, serif;
+        padding: 10px;
+
+    }
+
+    .text-content-end h5 {
+        text-align: left;
+        font-size: 60px;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        margin-bottom: 0px;
+    }
+.boton-reserva{
+    margin-right: 20%;
+    padding: 15px;
+
+}
+
 
 /*Footer*/
-
 .card-footer {
-    background-color: #907c4a;
+    background-color: #b6a579;
     color: white;
     padding: 40px;
     text-align: center;
