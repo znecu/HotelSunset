@@ -1,0 +1,42 @@
+﻿@page "/Galeria"
+
+<div class="gallery-section">
+    <h1>Conoce algunos <span class="highlight">Espacios y Platillos</span></h1>
+    <p>El Hotel que se acomoda a ti.</p>
+
+    <div class="gallery-grid">
+        @foreach (var image in Images)
+        {
+            <div class="gallery-item">
+                <img src="@image" alt="Galería de espacios y platillos">
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card-footer mt-5">
+    <div class="text-center">
+        <h4>© Hotel Sunset | Todos los derechos reservados. </h4>
+    </div>
+
+</div>
+
+@code {
+
+    private List<string> Images = new List<string>
+    {
+        "Imagenes/sala.jpg",
+        "Imagenes/Orden.jpg",
+        "Imagenes/individual.jpg",
+        "Imagenes/planogeneral.jpg",
+        "Imagenes/prueba2.jpg",
+        "Imagenes/psicina.jpg",
+        "Imagenes/extras.jpg",
+        "Imagenes/desayuno.jpg",
+        "Imagenes/spa2.jpg",
+        "Imagenes/habitaciondoble.jpg",
+        "Imagenes/baño.jpg",
+        "Imagenes/comida2.jpg",
+
+    };
+}
