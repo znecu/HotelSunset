@@ -27,6 +27,13 @@ public class ArticulosExtrasSerive(IDbContextFactory<ApplicationDbContext> DbFac
         return await _contexto.ArticulosExtras
             .AnyAsync(e => e.ExtrasId == extrasId);
     }
+    public async Task<bool> ExisteArticuloExtra(int extraId, string descripcion)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.ArticulosExtras
+            .AnyAsync(t => t.ExtrasId != extraId &&
+                t.Descripcion.ToLower().Equals(descripcion.ToLower()));
+    }
     private async Task<bool> Insertar(ArticulosExtras extras)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();

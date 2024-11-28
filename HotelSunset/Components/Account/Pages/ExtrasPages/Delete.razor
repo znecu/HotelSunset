@@ -1,0 +1,68 @@
+﻿@page "/Extras/Delete/{ExtrasId:int}"
+@using System.Globalization
+@rendermode InteractiveServer
+@layout EmptyLayout
+@inject ArticulosExtrasSerive articulosExtraSerive
+@inject NavigationManager navigationManager
+
+<PageTitle>Eliminar</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+
+        @*Header*@
+        <div class="header text-center">
+            <h3><strong>Eliminar un articulo extra</strong></h3>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="text-center mt-3">
+                <h5><strong>¿Está seguro de que desea eliminar este articulo extra?</strong></h5>
+            </div>
+            <ul class="mt-4">
+                <li><strong>ExtrasId: </strong>@ArticulosExtras.ExtrasId</li>
+                <li><strong>Descripci&oacute;n: </strong>@ArticulosExtras.Descripcion</li>
+                <li><strong>Precio: </strong>@ArticulosExtras.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
+                <li><strong>Cantidad: </strong>@ArticulosExtras.Cantidad</li>
+            </ul>
+        </div>
+
+        @*Footer*@
+        <div class="footer text-end mt-3">
+            <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+    </div>
+</div>
+@Mensaje
+@code {
+    [Parameter]
+    public int ExtrasId { get; set; }
+    public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ArticulosExtras = await articulosExtraSerive.Buscar(ExtrasId);
+    }
+
+    private async Task Eliminar()
+    {
+        var Eliminar = await articulosExtraSerive.Eliminar(ArticulosExtras);
+
+        if (Eliminar)
+        {
+            Mensaje = "Se ha eliminado correctamente. ";
+            Volver();
+        }
+        else
+        {
+            Mensaje = "No se ha podido eliminar. ";
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/Extras");
+    }
+}

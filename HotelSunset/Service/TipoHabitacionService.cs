@@ -27,6 +27,14 @@ public class TipoHabitacionService(IDbContextFactory<ApplicationDbContext> DbFac
         return await _contexto.TipoHabitaciones
             .AnyAsync(t => t.TipoHabitacionId == tipoHabitacionId);
     }
+    public async Task<bool> ExisteTipoHabitacion(int tipoHabitacionId, string descripcion, string categoria)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.TipoHabitaciones
+            .AnyAsync(t => t.TipoHabitacionId != tipoHabitacionId &&
+            (t.Descripcion.Equals(descripcion) || t.Categoria.ToLower().Equals(categoria.ToLower())));
+
+    }
     private async Task<bool> Insertar(TipoHabitaciones tipoHabitacion)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();

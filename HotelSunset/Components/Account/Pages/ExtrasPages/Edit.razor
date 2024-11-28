@@ -1,0 +1,96 @@
+﻿@page "/Extras/Edit/{ExtrasId:int}"
+@rendermode InteractiveServer
+@layout EmptyLayout
+@inject ArticulosExtrasSerive articulosExtraSerive
+@inject NavigationManager navigationManager
+
+<PageTitle>Edit</PageTitle>
+<EditForm Model="ArticulosExtras" OnValidSubmit="Editar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="shadow-lg">
+
+            @*Header*@
+            <div class="header text-center">
+                <h3><strong>Editar articulo extra </strong></h3>
+            </div>
+
+            @*Body*@
+            <div class="card-body">
+
+                @*Descripcion*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Descripci&oacute;n</strong></label>
+                    <InputText class="form-control" @bind-Value="ArticulosExtras.Descripcion"></InputText>
+                    <ValidationMessage For="(()=> ArticulosExtras.Descripcion)" />
+                </div>
+
+                @*Precio*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Precio</strong></label>
+                    <InputNumber class="form-control" @bind-Value="ArticulosExtras.Precio"></InputNumber>
+                    <ValidationMessage For="(()=> ArticulosExtras.Precio)" />
+                </div>
+
+                @*Cantidad*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Cantidad</strong></label>
+                    <InputNumber class="form-control" @bind-Value="ArticulosExtras.Cantidad"></InputNumber>
+                    <ValidationMessage For="(()=> ArticulosExtras.Cantidad)" />
+                </div>
+            </div>
+
+            @*Footer*@
+            <div class="footer text-center">
+                <button type="button" class="btn btn-primary" @onclick="() => Volver()">Volver</button>
+                <button type="submit" class="btn btn-success">Editar</button>
+            </div>
+        </div>
+    </div>
+    @Mensaje
+
+</EditForm>
+@code {
+    [Parameter]
+    public int ExtrasId { get; set; }
+    public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ArticulosExtras = await articulosExtraSerive.Buscar(ExtrasId);
+    }
+
+    public async Task Editar()
+    {
+        if (await Validar())
+        {
+            Mensaje = "Ya existe un articulo extra con esta descripción.";
+            return;
+        }
+
+        var crear = await articulosExtraSerive.Guardar(ArticulosExtras);
+
+        if (crear)
+        {
+            Mensaje = "Se ha modificado correctamente. ";
+            Volver();
+        }
+        else
+        {
+            Mensaje = "No se ha podido modificar. ";
+        }
+    }
+
+    private async Task<bool> Validar()
+    {
+        var existe = await articulosExtraSerive.ExisteArticuloExtra(ArticulosExtras.ExtrasId, ArticulosExtras.Descripcion);
+        return existe;
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/Extras");
+    }
+}
