@@ -40,7 +40,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<AgregadosServices>();
-builder.Services.AddScoped<ArticulosExtras>();
+builder.Services.AddScoped<ArticulosExtrasSerive>();
 builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<HabitacionesService>();
 builder.Services.AddScoped<HabitacionesDetalleService>();
