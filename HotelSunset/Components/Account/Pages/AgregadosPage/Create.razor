@@ -1,4 +1,4 @@
-﻿@page "/GestionHotel/Agregados/Create"
+﻿@page "/Agregados/Create"
 @inject AgregadosServices agregadoService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
@@ -8,34 +8,34 @@
     <DataAnnotationsValidator />
     <div class="container">
         <div class="shadow-lg">
-            <!-- Header -->
+            @*Header*@
             <div class="header text-center">
                 <h3><strong>Crear Agregados</strong></h3>
             </div>
-            <!-- Body -->
+            @*Body*@
             <div class="card-body">
-                <!-- Descripcion -->
+                @*Descripcion*@
                 <div class="col-1 mt-2">
                     <label class="form-label"><strong>Descripción</strong></label>
                     <InputText class="form-control" @bind-Value=agregados.Descripcion></InputText>
                     <ValidationMessage For="(() => agregados.Descripcion)"></ValidationMessage>
                 </div>
 
-                <!-- Precio -->
+                @*Precio*@
                 <div class="col-1 mt-2">
                     <label class="form-label"><strong>Precio</strong></label>
                     <InputNumber class="form-control" @bind-Value=agregados.Precio></InputNumber>
                     <ValidationMessage For="(() => agregados.Precio)"></ValidationMessage>
                 </div>
 
-                <!-- Existencia -->
+                @*Existencia*@
                 <div class="col-1 mt-2">
                     <label class="form-label"><strong>Existencia</strong></label>
                     <InputNumber class="form-control" @bind-Value=agregados.Existencia></InputNumber>
                     <ValidationMessage For="(() => agregados.Existencia)"></ValidationMessage>
                 </div>
             </div>
-            <!-- Footer -->
+            @*Footer*@
             <div class="footer">
                 <a href="GestionHotel/Agregados">
                     <button type="button" class="btn btn-secondary">Volver</button>
