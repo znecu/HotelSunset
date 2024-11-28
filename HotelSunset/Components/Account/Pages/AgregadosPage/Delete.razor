@@ -1,0 +1,61 @@
+﻿@page "/Agregados/Eliminar/{AgregadoId:int}"
+
+@inject AgregadosServices agregadosService
+
+<PageTitle>Eliminar Agregado</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+        @*Header*@
+        <div class="card-header">
+            <div class="text-center">
+                <h2><strong>Eliminar Agregado</strong></h2>
+            </div>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            <div class="text-center mt-3">
+                <h5><strong>¿Está seguro de que desea eliminar este artículo extra?</strong></h5>
+            </div>
+            <ul class="mt-4">
+                <li><strong>AgregadoId: </strong>@Agregados.AgregadoId</li>
+                <li><strong>Descripción: </strong>@Agregados.Descripcion</li>
+                <li><strong>Precio: </strong>@Agregados.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
+                <li><strong>Cantidad: </strong>@Agregados.Existencia</li>
+            </ul>
+        </div>
+        @*Footer*@
+        <div class="footer text-end mt-3">
+            <a href="GestionHotel/Agregados">
+                <button type="button" class="btn btn-secondary">Volver</button>
+            </a>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+    </div>
+</div>
+@Mensaje
+
+@code {
+    [Parameter]
+    public int AgregadoId { get; set; }
+    public Agregados Agregados { get; set; } = new Agregados();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Agregados = await agregadosService.Buscar(AgregadoId);
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminar = await agregadosService.Eliminar(Agregados);
+
+        if (eliminar)
+        {
+            Mensaje = "Se ha eliminado correctamente.";
+        }
+        else
+        {
+            Mensaje = "No se ha podido eliminar.";
+        }
+    }
+}
