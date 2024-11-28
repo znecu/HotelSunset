@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand">Gesti&oacute;n del Hotel</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span aria-hidden="true"></span> Inicio
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/GestionHotel/CrearHabitacion">
+                <span aria-hidden="true"></span> Crear habitaci&oacute;n
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/GestionHotel/Extras">
+                <span aria-hidden="true"></span> Extras
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/GestionHotel/Agregados">
+                <span aria-hidden="true"></span> Agregados
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/GestionHotel/TiposHabitaciones">
+                <span aria-hidden="true"></span> Tipos de Habitaciones
+            </NavLink>
+        </div>
+
+    </nav>
+</div>
