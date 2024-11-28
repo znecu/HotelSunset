@@ -1,6 +1,8 @@
 using HotelSunset.Components;
 using HotelSunset.Components.Account;
 using HotelSunset.Data;
+using HotelSunset.Models;
+using HotelSunset.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +26,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -37,7 +39,16 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 
 builder.Services.AddBlazorBootstrap();
-
+builder.Services.AddScoped<AgregadosServices>();
+builder.Services.AddScoped<ArticulosExtras>();
+builder.Services.AddScoped<ClientesService>();
+builder.Services.AddScoped<HabitacionesService>();
+builder.Services.AddScoped<HabitacionesDetalleService>();
+builder.Services.AddScoped<MetodoPagoService>();
+builder.Services.AddScoped<ReservasService>();
+builder.Services.AddScoped<ReservasDetalleService>();
+builder.Services.AddScoped<ServiciosService>();
+builder.Services.AddScoped<TipoHabitacionService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

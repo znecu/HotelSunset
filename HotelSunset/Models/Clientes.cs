@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelSunset.Models;
 
@@ -6,7 +7,8 @@ public class Clientes
 {
     [Key]
     public int ClienteId { get; set; }
-
+    [ForeignKey("ReservasId")]
+    public int ReservasId { get; set; }
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "Solo se permiten lestras en este campo.")]
     public string? Nombres { get; set; }
@@ -22,7 +24,6 @@ public class Clientes
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
-
+    public Reservas? Reservas { get; set; }
     public ICollection<MetodoPago> MetodoPagos { get; set; } = new List<MetodoPago>();
-    public ICollection<Reservas>? Reservas { get; set; } = new List<Reservas>();
 }
