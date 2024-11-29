@@ -67,7 +67,7 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
         return await _contexto.Habitaciones
-            .Include(h => h.TipoHabitacionId)
+            .Include(h => h.TipoHabitaciones)
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();
