@@ -17,7 +17,8 @@ namespace HotelSunset.Models
         public Habitaciones? Habitaciones { get; set; }
         public int Cantidad { get; set; }
 
-        [Range(1, 4, ErrorMessage = "El monto debe ser mayor a 0.")]
+        [Required(ErrorMessage = "Este campo es obligatorio.")]
+        [Range(1, 999999, ErrorMessage = "Ingrese un número mayor que {1} y menor que {2}")]
         public double Precio {  get; set; }
     }
 }
