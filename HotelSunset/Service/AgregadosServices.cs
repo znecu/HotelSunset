@@ -54,6 +54,15 @@ public class AgregadosServices(IDbContextFactory<ApplicationDbContext> DbFactory
             .ExecuteDeleteAsync() > 0;
     }
 
+    public async Task<bool> ExisteAgregados(int agregadosId, string Descripcion)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+
+        return await _contexto.Agregados
+            .AnyAsync(c => c.AgregadoId != agregadosId
+            && (c.Descripcion.ToLower().Equals(Descripcion.ToLower())));
+    }
+
     public async Task<Agregados?> Buscar(int agregadosId)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
