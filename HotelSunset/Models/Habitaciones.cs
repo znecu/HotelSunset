@@ -12,13 +12,13 @@ namespace HotelSunset.Models
         public int TipoHabitacionId { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio.")]
-        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "Solo se permiten letras.")]
+        [RegularExpression("^^[a-zA-Z0-9\\-]+$", ErrorMessage = "Solo se permiten si.")]
         public string? NumeroHabitacion { get; set; }
 
         public bool Estado { get; set; } = true;  //True = habitacion disposible / false Reservada
 
         [Required(ErrorMessage = "Este campo es obligatorio.")]
-        [Range(1, double.MaxValue, ErrorMessage = "El precio es demasido alto para el sistema")]
+        [Range(1, 999999, ErrorMessage = "Ingrese un número mayor que {1} y menor que {2}")]
 
         public double PrecioBase { get; set; }
 
@@ -29,6 +29,6 @@ namespace HotelSunset.Models
         public TipoHabitaciones? TipoHabitaciones { get; set; }
 
         public ICollection<Reservas> Reservas { get; set; } = new List<Reservas>();
-        public ICollection<HabitacionDetalle> habitacionDetalles { get; set; } = new List<HabitacionDetalle>();
+        public ICollection<HabitacionDetalle> HabitacionDetalles { get; set; } = new List<HabitacionDetalle>();
     }
 }
