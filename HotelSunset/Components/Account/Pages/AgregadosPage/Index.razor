@@ -1,6 +1,7 @@
 ﻿@page "/GestionHotel/Agregados"
 @using HotelSunset.Models
 @using HotelSunset.Service
+@using System.Globalization
 @inject AgregadosServices agregadoService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
@@ -37,7 +38,7 @@
                         <tr>
                             <td>@agregados.AgregadoId</td>
                             <td>@agregados.Descripcion</td>
-                            <td>@agregados.Precio</td>
+                            <td>@agregados.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                             <td>@agregados.Existencia</td>
                             @*Editar*@
                             <td>
