@@ -1,0 +1,89 @@
+﻿@page "/CrearHabitacion/Delete/{HabitacionId:int}"
+@using System.Globalization
+@layout EmptyLayout
+@inject HabitacionesService habitacionesService
+@inject TipoHabitacionService tipoHabitacionService
+@inject HabitacionesDetalleService habitacionDetalleService
+@inject AgregadosServices agregadosService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Delete</PageTitle>
+
+<div class="container">
+    <div class="shadow-lg">
+
+        @*Header*@
+        <div class="card-header text-center">
+            <h3><strong>Eliminar habitaci&oacute;n</strong></h3>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="text-center mt-3">
+                <h5><strong>¿Est&aacute; seguro de que desea eliminar esta habitaci&oacute;n?</strong></h5>
+            </div>
+
+            <ul class="mt-4">
+                <li><strong>Habitaci&oacute;nId: </strong>@Habitaciones.HabitacionId</li>
+                <li><strong>Tipo de habitaci&oacute;n: </strong>@TipoHabitaciones.Descripcion</li>
+                <li><strong>N&uacute;mero de habitaci&oacute;n: </strong>@Habitaciones.NumeroHabitacion</li>
+                <li><strong>Precio base: </strong>@Habitaciones.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
+                <li><strong>Capacidad: </strong>@Habitaciones.Capacidad</li>
+
+                @foreach (var detalle in ListaHabitacionDetalle)
+                {
+                    <li><strong>Agregado: </strong>@detalle.Agregados.Descripcion</li>
+                }
+
+                <li><strong>Monto total: </strong>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
+            </ul>
+        </div>
+
+        @*Footer*@
+        <div class="card-footer text-end mt-3">
+            <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+    </div>
+</div>
+@Mensaje
+
+@code {
+    [Parameter]
+    public int HabitacionId { get; set; }
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public HabitacionDetalle HabitacionDetalle { get; set; } = new HabitacionDetalle();
+    public List<HabitacionDetalle> ListaHabitacionDetalle { get; set; } = new List<HabitacionDetalle>();
+    public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
+    public string Mensaje { get; set; } = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Habitaciones = await habitacionesService.Buscar(HabitacionId);
+        TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
+        ListaHabitacionDetalle = await habitacionesService.BuscarDetalle(Habitaciones.HabitacionId);
+    }
+
+    private async Task Eliminar()
+    {
+        var Eliminar = await habitacionesService.Eliminar(Habitaciones);
+
+        if (Eliminar)
+        {
+            Mensaje = "La habitación se ha eliminado correctamente. ";
+            Volver();
+        }
+
+        else
+        {
+            Mensaje = "No se ha podido eliminar la habitación. ";
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/CrearHabitacion");
+    }
+}

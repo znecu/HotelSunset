@@ -80,4 +80,12 @@ public class AgregadosServices(IDbContextFactory<ApplicationDbContext> DbFactory
             .Where(criterio)
             .ToListAsync();
     }
+
+    public async Task<List<Agregados>> ListarAgregados()
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.Agregados
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }

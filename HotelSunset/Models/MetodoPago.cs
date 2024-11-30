@@ -8,8 +8,10 @@ public class MetodoPago
     [Key]
     public int MetodoPagoId { get; set; }
 
-    [ForeignKey("ClienteId")]
     public int ClienteId { get; set; }
+    [ForeignKey("ClienteId")]
+    public Clientes? Clientes { get; set; }
+
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     public string? NombresApellido { get; set; }
@@ -24,5 +26,4 @@ public class MetodoPago
 
     [RegularExpression(@"^\d{3}$", ErrorMessage = "El código de seguridad debe contener 3 dígitos.")]
     public string? CodigoSeguridad { get; set; }
-    public Clientes? Clientes { get; set; }
 }

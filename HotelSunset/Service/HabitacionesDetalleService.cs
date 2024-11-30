@@ -16,4 +16,14 @@ public class HabitacionesDetalleService(IDbContextFactory<ApplicationDbContext> 
             .Where(criterio)
             .ToListAsync();
     }
+
+    public async Task<List<HabitacionDetalle>> ListarDetalle(int id)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        var detalle = await _contexto.HabitacionDetalle
+            .Where(d => d.HabitacionDetalleId == id)
+            .ToListAsync();
+
+        return detalle;
+    }
 }

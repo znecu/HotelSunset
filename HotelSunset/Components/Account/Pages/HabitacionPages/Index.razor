@@ -1,0 +1,88 @@
+﻿@page "/GestionHotel/CrearHabitacion"
+@using System.Globalization
+@layout AdminLayout
+@inject HabitacionesService habitacionesService
+@inject TipoHabitacionService tipoHabitacionService
+@inject NavigationManager navigationManager
+
+<PageTitle>Index</PageTitle>
+<div class="container">
+    <div class=" shadow-lg">
+
+        @*Header*@
+        <div class="header text-center"
+            <h1><strong> Registro de habitaciones</strong></h1>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="row">
+              
+                @*Crear*@
+                <div class="col text-end">
+                    <a href="/CrearHabitacion/Create">
+                        <button type="button" class="btn btn-success bi bi-person-plus-fill"> Crear</button>
+                    </a>
+                </div>
+            </div>
+
+            @*Tabla*@
+            <table class="table table-bordered text-center mt-5">
+                <thead>
+                    <tr>
+                        <th>Habitaci&oacute;nId</th>
+                        <th>TipoHabitaci&oacute;n</th>
+                        <th>N&uacute;meroHabitaci&oacute;n</th>
+                        <th>PrecioBase</th>
+                        <th>Capacidad</th>
+                        <th>MontoTotal</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var habitacion in ListaHabitaciones)
+                    {
+                        <tr>
+                            <td>@habitacion.HabitacionId</td>
+                            <td>@habitacion.TipoHabitacionId</td>
+                            <td>@habitacion.NumeroHabitacion</td>
+                            <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            <td>@habitacion.Capacidad</td>
+                            <td>@habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+
+                            @*Editar*@
+                            <td>
+                                <a href="CrearHabitacion/Edit/@habitacion.HabitacionId"><button type="button" class=" btn btn-outline-warning bi bi-pencil"></button></a>
+                            </td>
+
+                            @*Eliminar*@
+                            <td>
+                                <a href="CrearHabitacion/Delete/@habitacion.HabitacionId"><button type="button" class=" btn btn-outline-danger bi bi-trash3  "></button></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @*Footer*@
+        <div class="footer">
+            <p><strong>Cantidad de habitaciones: </strong>@ListaHabitaciones.Count</p>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
+    public List<TipoHabitaciones> ListaTipoHabitaciones { get; set; } = new List<TipoHabitaciones>();
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaHabitaciones = await habitacionesService.Listar(t => t.TipoHabitacionId > 0);
+        ListaTipoHabitaciones = await tipoHabitacionService.Listar(t => t.TipoHabitacionId > 0);
+    }
+}

@@ -59,9 +59,22 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
         return await _contexto.Habitaciones
+            .Include(h => h.HabitacionDetalles)
+            .Include(t => t.TipoHabitaciones)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.HabitacionId == habitacionId);
     }
+
+    public async Task<List<HabitacionDetalle>> BuscarDetalle(int id)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.HabitacionDetalle
+            .Include(a => a.Agregados)
+            .AsNoTracking()
+            .Where(h => h.HabitacionId == id)
+            .ToListAsync();
+    }
+
     public async Task<List<Habitaciones>> Listar(Expression<Func<Habitaciones, bool>> criterio)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();

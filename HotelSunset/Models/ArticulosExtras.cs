@@ -11,8 +11,8 @@ public class ArticulosExtras
     public string? Descripcion { get; set; }
     public double Precio { get; set; }
 
-    [Range(1,500, ErrorMessage = "El articulo esta agotado.")]
-    public int Cantidad { get; set; }
+    [Range(1,500, ErrorMessage = "El articulo está agotado.")]
+    public int Existencia { get; set; }
 
 }
 

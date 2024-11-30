@@ -8,13 +8,14 @@ namespace HotelSunset.Models
         [Key]
         public int HabitacionDetalleId { get; set; }
 
-        [ForeignKey("AgregadoId")]
         public int AgregadoId { get; set; }
-
-        [ForeignKey("HabitacionId")]
-        public int HabitacionId { get; set; }
+        [ForeignKey("AgregadoId")]
         public Agregados? Agregados { get; set; }
+
+        public int HabitacionId { get; set; }
+        [ForeignKey("HabitacionId")]
         public Habitaciones? Habitaciones { get; set; }
+
         public int Cantidad { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio.")]
