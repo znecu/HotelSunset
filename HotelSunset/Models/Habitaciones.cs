@@ -8,8 +8,9 @@ namespace HotelSunset.Models
         [Key]
         public int HabitacionId { get; set; }
 
-        [ForeignKey("TipoHabitacionId")]
         public int TipoHabitacionId { get; set; }
+        [ForeignKey("TipoHabitacionId")]
+        public TipoHabitaciones? TipoHabitaciones { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio.")]
         [RegularExpression("^^[a-zA-Z0-9\\-]+$", ErrorMessage = "Solo se permiten si.")]
@@ -27,7 +28,6 @@ namespace HotelSunset.Models
         public int Capacidad { get; set; }
 
         public double MontoTotal { get; set; }
-        public TipoHabitaciones? TipoHabitaciones { get; set; }
 
         public ICollection<Reservas> Reservas { get; set; } = new List<Reservas>();
         public ICollection<HabitacionDetalle> HabitacionDetalles { get; set; } = new List<HabitacionDetalle>();
