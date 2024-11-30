@@ -30,18 +30,11 @@
                 <li><strong>N&uacute;mero de habitaci&oacute;n: </strong>@Habitaciones.NumeroHabitacion</li>
                 <li><strong>Precio base: </strong>@Habitaciones.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
                 <li><strong>Capacidad: </strong>@Habitaciones.Capacidad</li>
-                <li><strong>Agregado: </strong>@HabitacionDetalle.Agregados?.Descripcion</li>
-                @* <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    @foreach (var detalle in ListaHabitacionDetalle)
-                    {
-                        <div style="border: 1px solid #ccc; padding: 10px;">
-                            <strong>Agregado: </strong>@detalle.Agregados.Descripcion<br />
-                            <strong>Cantidad de agregado: </strong>@detalle.Cantidad<br />
-                            <strong>Precio: </strong>@detalle.Agregados.Precio
-                        </div>
-                    }
-                </div> *@
 
+                @foreach (var detalle in ListaHabitacionDetalle)
+                {
+                    <li><strong>Agregado: </strong>@detalle.Agregados.Descripcion</li>
+                }
 
                 <li><strong>Monto total: </strong>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
             </ul>
@@ -63,15 +56,14 @@
     public HabitacionDetalle HabitacionDetalle { get; set; } = new HabitacionDetalle();
     public List<HabitacionDetalle> ListaHabitacionDetalle { get; set; } = new List<HabitacionDetalle>();
     public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
-
-
     public string Mensaje { get; set; } = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
         Habitaciones = await habitacionesService.Buscar(HabitacionId);
         TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
-        ListaHabitacionDetalle = await habitacionesService.BuscarDetalle(HabitacionId);
+        ListaHabitacionDetalle = await habitacionesService.BuscarDetalle(Habitaciones.HabitacionId);
     }
 
     private async Task Eliminar()
