@@ -26,6 +26,7 @@ namespace HotelSunset.Models
         [Range(1, 4, ErrorMessage = "La capacidad debe ser entre 1 y 4.")]
         public int Capacidad { get; set; }
 
+        public double MontoTotal { get; set; }
         public TipoHabitaciones? TipoHabitaciones { get; set; }
 
         public ICollection<Reservas> Reservas { get; set; } = new List<Reservas>();
