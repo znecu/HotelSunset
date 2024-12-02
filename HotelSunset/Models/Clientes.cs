@@ -22,6 +22,7 @@ public class Clientes
     public string? Telefono { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "El correo electrónico no tiene un formato válido.")]
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
