@@ -1,0 +1,183 @@
+﻿@page "/Reservas/Create"
+@using System.Globalization
+@inject HabitacionesService habitacionesService
+@inject ReservasService reservasServices
+@inject NavigationManager navigationManager
+@inject ArticulosExtrasSerive articulosExtrasService
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Reservas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="shadow-lg">
+
+            @*Header*@
+            <div class="header text-center">
+                <h3><strong>Crear Reserva </strong></h3>
+
+            </div>
+
+            @*Body*@
+            <div class="card-body">
+
+                @*Fecha Inicio*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Fecha Inicio</strong></label>
+                    <InputDate class="form-control" @bind-Value="@Reservas.FechaInicio"></InputDate>
+                    <ValidationMessage For="(()=> Reservas.FechaInicio)" />
+                </div>
+                @*Fecha Final*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Fecha Final</strong></label>
+                    <InputDate class="form-control" @bind-Value="@Reservas.FechaFinal"></InputDate>
+                    <ValidationMessage For="(()=> Reservas.FechaFinal)" />
+                </div>
+
+                @*Detalle*@
+                <div class="border border-success p-3 mt-3">
+                    <h5>Detalle de Reserva</h5>
+                    <div class="input-group align-items-center mt-2">
+                        <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.ExtrasId>
+                            <option value="0" selected disabled>Seleccione un articulo extra</option>
+                            @foreach (var extra in ListaArticulosExtras)
+                            {
+                                <option value="@extra.ExtrasId">@extra.Descripcion (@extra.Precio)</option>
+                            }
+                        </InputSelect>
+
+                        <label class="col-form-label input-group-text">Cantidad:</label>
+                        <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
+
+                        <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle>Agregar</button>
+                    </div>
+
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr>
+                                <th>Agregado</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in Reservas.ReservasDetalles)
+                            {
+                                <tr>
+                                    <td>@detalle.ExtrasId</td>
+                                    <td>@detalle.Cantidad</td>
+                                    <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                    <td>
+
+                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @*MontoTotal*@
+                <div>
+                    <label class="form-label">Monto Total</label>
+                    <InputNumber class="form-control" @bind-Value="Reservas.Total" ReadOnly="true"></InputNumber>
+                    <ValidationMessage For="(()=> Reservas.Total)" />
+                </div>
+
+            </div>
+            @*Footer*@
+            <div class="footer">
+                <button type="button" class="btn btn-primary" @onclick="() => Volver()">Volver</button>
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </div>
+    @Mensaje
+</EditForm>
+
+@code {
+
+    public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
+    public Reservas Reservas { get; set; } = new Reservas();
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public ReservasDetalle DetalleSeleccionado { get; set; } = new ReservasDetalle();
+    public List<ReservasDetalle> ListaReservaDetalle { get; set; } = new List<ReservasDetalle>();
+    public List<ArticulosExtras> ListaArticulosExtras { get; set; } = new List<ArticulosExtras>();
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
+    public List<Reservas> ListaReservas { get; set; } = new List<Reservas>();
+
+    public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
+        ListaHabitaciones = await habitacionesService.Listar(a => true);
+        ListaReservas = await reservasServices.Listar(r=> true);
+    }
+
+    public async Task Guardar()
+    {
+        var crear = await reservasServices.Guardar(Reservas);
+
+        if (crear)
+        {
+            Mensaje = "Creado exitosamente.";
+        }
+
+        else
+        {
+            Mensaje = "No se ha podido realizar la reserva. ";
+        }
+    }
+
+    public void AgregarDetalle()
+    {
+
+        if (DetalleSeleccionado.ExtrasId == 0 || DetalleSeleccionado.Cantidad <= 0)
+        {
+            return;
+        }
+
+        var extrasSeleccionado = ListaArticulosExtras.FirstOrDefault(e => e.ExtrasId == DetalleSeleccionado.ExtrasId);
+
+        if (extrasSeleccionado != null)
+        {
+            var precioTotal = extrasSeleccionado.Precio * DetalleSeleccionado.Cantidad;
+
+            Reservas.ReservasDetalles.Add(new ReservasDetalle
+                {
+                    ExtrasId = extrasSeleccionado.ExtrasId,
+                    Precio = precioTotal,
+                    Cantidad = DetalleSeleccionado.Cantidad
+
+                });
+
+            Reservas.Total = Habitaciones.MontoTotal + precioTotal;
+            foreach (var detalle in Reservas.ReservasDetalles)
+            {
+                Reservas.Total += detalle.Precio;
+            }
+
+            DetalleSeleccionado = new ReservasDetalle();
+        }
+    }
+
+    public void RemoverDetalle(ReservasDetalle eliminarDetalle)
+    {
+        Reservas.ReservasDetalles.Remove(eliminarDetalle);
+
+        Reservas.Total = Habitaciones.MontoTotal;
+
+        foreach (var detalle in Reservas.ReservasDetalles)
+        {
+            Reservas.Total += detalle.Precio;
+        }
+
+        DetalleSeleccionado = new ReservasDetalle();
+    }
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/CrearHabitacion");
+    }
+}
