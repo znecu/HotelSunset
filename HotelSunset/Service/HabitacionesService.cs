@@ -75,6 +75,29 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
             .ToListAsync();
     }
 
+    //public async Task<List<Habitaciones>> BuscarHabitacionDisponibles(DateTime fechaInicio, DateTime fechaFinal)
+    //{
+    //    await using var _contexto = await DbFactory.CreateDbContextAsync();
+
+    //    return await _contexto.Habitaciones
+    //        .Include(h => h.TipoHabitaciones)
+    //        .Where(h => !h.Reservas.Any(r =>
+    //            (fechaInicio >= r.FechaInicio && fechaInicio < r.FechaFinal) ||
+    //            (fechaFinal > r.FechaInicio && fechaFinal <= r.FechaFinal) ||
+    //            (r.FechaInicio >= fechaInicio && r.FechaFinal <= fechaFinal)))
+    //        .ToListAsync();
+    //}
+
+    public async Task<List<Habitaciones>> ListarConDetalles()
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.Habitaciones
+            .Include(h => h.TipoHabitaciones) // Incluye la relación con TipoHabitacion (si existe)
+            /*.Include(h => h.Reservas)*/ // Incluye reservas (si quieres relacionarlas)
+            .ToListAsync();
+    }
+
+
     public async Task<List<Habitaciones>> Listar(Expression<Func<Habitaciones, bool>> criterio)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
