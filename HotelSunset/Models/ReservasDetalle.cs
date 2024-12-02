@@ -19,5 +19,7 @@ public class ReservasDetalle
 
     [Range(1, 10, ErrorMessage = "La capacidad debe ser entre 1 y 10.")]
     public int Cantidad { get; set; }
-  
+
+    public double Precio { get; set; }
+
 }
