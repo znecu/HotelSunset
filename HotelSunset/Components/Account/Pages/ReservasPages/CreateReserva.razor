@@ -1,4 +1,4 @@
-﻿@page "/Reservas/Create/{HabitacionId:int}"
+﻿@page "/Reservas/Create/{HabitacionId:int}/{FechaInicio}/{FechaFinal}"
 @using System.Globalization
 @inject HabitacionesService habitacionesService
 @inject ReservasService reservasServices
@@ -16,30 +16,18 @@
             @*Header*@
             <div class="header text-center">
                 <h3><strong>Crear Reserva </strong></h3>
-
             </div>
 
             @*Body*@
             <div class="card-body">
 
-                @*Habitacion*@
-                @* <div class="col-2 mt-2">
-                    <label class="form-control"><strong>Habitacion</strong></label>
-                    <InputText class="form-control" @bind-Value="@Habitaciones.TipoHabitaciones.Descripcion"></InputText>
-                    <ValidationMessage For="(()=> Reservas.FechaInicio)" />
-                </div> *@
-
-                @* Fecha Inicio *@
-                <div class="col-2 mt-2">
-                    <label class="form-label"><strong>Fecha Inicio</strong></label>
-                    <InputDate class="form-control" @bind-Value="@Reservas.FechaInicio"></InputDate>
-                    <ValidationMessage For="(()=> Reservas.FechaInicio)" />
-                </div>
-                @*Fecha Final*@
-                <div class="col-2 mt-2">
-                    <label class="form-label"><strong>Fecha Final</strong></label>
-                    <InputDate class="form-control" @bind-Value="@Reservas.FechaFinal"></InputDate>
-                    <ValidationMessage For="(()=> Reservas.FechaFinal)" />
+                @* Información de la habitación seleccionada *@
+                <div>
+                    <strong>Habitación: </strong> @Habitaciones.NumeroHabitacion
+                    <br />
+                    <strong>Fecha de Inicio: </strong> @Reservas.FechaInicio
+                    <br />
+                    <strong>Fecha Final: </strong> @Reservas.FechaFinal
                 </div>
 
                 @*Detalle*@
@@ -105,6 +93,10 @@
 @code {
     [Parameter]
     public int HabitacionId { get; set; }
+    [Parameter]
+    public string FechaInicio { get; set; } = string.Empty;
+    [Parameter]
+    public string FechaFinal { get; set; } = string.Empty;
     public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
     public Reservas Reservas { get; set; } = new Reservas();
     public Habitaciones Habitaciones { get; set; } = new Habitaciones();
@@ -124,11 +116,14 @@
         {
             Reservas.HabitacionId = HabitacionId;
         }
-        // TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
+
+        if (!string.IsNullOrEmpty(FechaInicio) && !string.IsNullOrEmpty(FechaFinal))
+        {
+            Reservas.FechaInicio = DateTime.ParseExact(FechaInicio, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            Reservas.FechaFinal = DateTime.ParseExact(FechaFinal, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
         ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
-        ListaHabitaciones = await habitacionesService.Listar(a => true);
-        ListaReservas = await reservasServices.Listar(r=> true);
-        Habitaciones = await habitacionesService.Buscar(Habitaciones.TipoHabitacionId);
     }
 
     public async Task Guardar()
