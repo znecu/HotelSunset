@@ -14,6 +14,7 @@ public class MetodoPago
 
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
+    [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? NombresApellido { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
