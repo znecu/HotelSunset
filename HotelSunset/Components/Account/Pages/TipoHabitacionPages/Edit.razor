@@ -3,6 +3,8 @@
 @layout EmptyLayout
 @inject TipoHabitacionService tipoHabitacionService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Edit</PageTitle>
 <EditForm Model="TipoHabitaciones" OnValidSubmit="Editar">
@@ -41,25 +43,38 @@
             </div>
         </div>
     </div>
-    @Mensaje
 
 </EditForm>
 @code {
-        [Parameter]
-        public int TipoHabitacionId { get; set; }
+    [Parameter]
+    public int TipoHabitacionId { get; set; }
     public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
     {
         TipoHabitaciones = await tipoHabitacionService.Buscar(TipoHabitacionId);
     }
 
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
     public async Task Editar()
     {
         if (await Validar())
         {
-            Mensaje = "Ya existe un tipo de habitación con esta categoria.";
+            Notificacion(ToastType.Warning, "Editar tipo de habitación", "Ya existe un tipo de habitación con esta descripción ");
             return;
         }
 
@@ -67,12 +82,13 @@
 
         if (crear)
         {
-            Mensaje = "Se ha modificado correctamente. ";
+            Notificacion(ToastType.Success, "Editar tipo de habitación", "Se ha modificado correctamente ");
+            await Task.Delay(1500);
             Volver();
         }
         else
         {
-            Mensaje = "No se ha podido modificar. ";
+            Notificacion(ToastType.Danger, "Editar tipo de habitación", "No se pudo modificar el tipo de habitación ");
         }
     }
 
