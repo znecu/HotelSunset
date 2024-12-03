@@ -4,6 +4,7 @@
 @inject ReservasService reservasServices
 @inject NavigationManager navigationManager
 @inject ArticulosExtrasSerive articulosExtrasService
+@inject TipoHabitacionService tipoHabitacionService
 @rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
@@ -23,11 +24,17 @@
 
                 @* Información de la habitación seleccionada *@
                 <div>
+                    <strong>Tipo de habitaci&oacute;n: </strong>@TipoHabitaciones.Categoria
+                    <br />
                     <strong>Habitación: </strong> @Habitaciones.NumeroHabitacion
                     <br />
-                    <strong>Fecha de Inicio: </strong> @Reservas.FechaInicio
+                    <strong>Fecha de Inicio: </strong> @Reservas.FechaInicio?.ToString("yyyy-MM-dd")
                     <br />
-                    <strong>Fecha Final: </strong> @Reservas.FechaFinal
+                    <strong>Fecha Final: </strong> @Reservas.FechaFinal?.ToString("yyyy-MM-dd")
+                    <br />
+                    <strong>Capacidad: </strong> @Habitaciones.Capacidad
+                    <br />
+                    <strong>Precio Base: </strong> @Habitaciones.MontoTotal
                 </div>
 
                 @*Detalle*@
@@ -124,6 +131,7 @@
         }
 
         ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
+        TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
     }
 
     public async Task Guardar()
