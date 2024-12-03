@@ -7,6 +7,8 @@
 @inject AgregadosServices agregadosService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Create</PageTitle>
 <EditForm Model="Habitaciones" OnValidSubmit="Guardar">
@@ -64,7 +66,7 @@
                             <option value="0" selected disabled>Seleccione un agregado</option>
                             @foreach (var agregado in ListaAgregados)
                             {
-                                <option value="@agregado.AgregadoId">@agregado.Descripcion (@agregado.Precio)</option>
+                                <option value="@agregado.AgregadoId">@agregado.Descripcion (@agregado.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US")))</option>
                             }
                         </InputSelect>
 
@@ -112,10 +114,7 @@
             </div>
         </div>
     </div>
-    @Mensaje
 </EditForm>
-
-
 
 @code {
     public Habitaciones Habitaciones { get; set; } = new Habitaciones();
@@ -125,7 +124,8 @@
     public List<HabitacionDetalle> ListaHabitacionDetalle { get; set; } = new();
     public List<Agregados> ListaAgregados { get; set; } = new();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,19 +135,33 @@
         ListaHabitacionDetalle = await habitacionDetalleService.Listar(t => true);
     }
 
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
     public async Task Guardar()
     {
 
         var crear = await habitacionesService.Guardar(Habitaciones);
         if (crear)
         {
-            Mensaje = "Creado exitosamente.";
+            Notificacion(ToastType.Success, "Creación de habitación", "Se ha creado correctamente ");
+            await Task.Delay(1500);
             Volver();
         }
 
         else
         {
-            Mensaje = "No se ha podido crear el articulo extra. ";
+            Notificacion(ToastType.Danger, "Creación de habitación", "No se pudo crear la habitación ");
         }
     }
 
