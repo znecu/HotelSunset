@@ -4,6 +4,8 @@
 @layout EmptyLayout
 @inject ArticulosExtrasSerive articulosExtraSerive
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Eliminar</PageTitle>
 <div class="container">
@@ -34,16 +36,30 @@
         </div>
     </div>
 </div>
-@Mensaje
+
 @code {
     [Parameter]
     public int ExtrasId { get; set; }
     public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
     {
         ArticulosExtras = await articulosExtraSerive.Buscar(ExtrasId);
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
     }
 
     private async Task Eliminar()
@@ -52,12 +68,13 @@
 
         if (Eliminar)
         {
-            Mensaje = "Se ha eliminado correctamente. ";
+            Notificacion(ToastType.Success, "Eliminación de articulo extra", "Se ha eliminado correctamente ");
+            await Task.Delay(1500);
             Volver();
         }
         else
         {
-            Mensaje = "No se ha podido eliminar. ";
+            Notificacion(ToastType.Danger, "Eliminación de articulo extra", "No se ha podido eliminar el articulo extra ");
         }
     }
 

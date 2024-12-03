@@ -4,7 +4,8 @@
 @inject AgregadosServices agregadoService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
-
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <EditForm Model="agregados" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
@@ -44,7 +45,6 @@
                 </a>
                 <button type="submit" class="btn btn-success">Guardar</button>
             </div>
-            @Mensaje
         </div>
     </div>
 </EditForm>
@@ -52,7 +52,8 @@
 @code {
     public Agregados agregados { get; set; } = new Agregados();
     public List<Agregados> ListaAgregado { get; set; } = new List<Agregados>();
-    public string Mensaje = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     public async Task<bool> Validar()
     {
@@ -60,22 +61,43 @@
         return existe;
     }
 
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
     public async Task Guardar()
     {
         if (await Validar())
         {
-            Mensaje = "Ya existe este agregado.";
+            Notificacion(ToastType.Warning, "Creación de agregado", "Ya existe un agregado con esta descripción ");
         }
 
         var crear = await agregadoService.Guardar(agregados);
 
         if (crear)
         {
-            Mensaje = "Se ha creado correctamente.";
+            Notificacion(ToastType.Success, "Creación de agregado", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+
         }
         else
         {
-            Mensaje = "No se pudo crear.";
+            Notificacion(ToastType.Danger, "Creación de agregado", "No se pudo crear el agregado ");
         }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/Agregados");
     }
 }

@@ -7,7 +7,7 @@ public class ArticulosExtras
     public int ExtrasId { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio")]
-    [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Este campo solo permite letras. ")]
+    [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? Descripcion { get; set; }
     public double Precio { get; set; }
 

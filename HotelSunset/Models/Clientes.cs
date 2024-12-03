@@ -13,7 +13,7 @@ public class Clientes
     public Reservas? Reservas { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "Solo se permiten lestras en este campo.")]
+    [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? Nombres { get; set; }
 
 
