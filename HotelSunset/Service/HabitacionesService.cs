@@ -61,6 +61,7 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
         return await _contexto.Habitaciones
             .Include(h => h.HabitacionDetalles)
             .Include(t => t.TipoHabitaciones)
+            .Include(r => r.Reservas)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.HabitacionId == habitacionId);
     }
@@ -75,28 +76,15 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
             .ToListAsync();
     }
 
-    //public async Task<List<Habitaciones>> BuscarHabitacionDisponibles(DateTime fechaInicio, DateTime fechaFinal)
-    //{
-    //    await using var _contexto = await DbFactory.CreateDbContextAsync();
-
-    //    return await _contexto.Habitaciones
-    //        .Include(h => h.TipoHabitaciones)
-    //        .Where(h => !h.Reservas.Any(r =>
-    //            (fechaInicio >= r.FechaInicio && fechaInicio < r.FechaFinal) ||
-    //            (fechaFinal > r.FechaInicio && fechaFinal <= r.FechaFinal) ||
-    //            (r.FechaInicio >= fechaInicio && r.FechaFinal <= fechaFinal)))
-    //        .ToListAsync();
-    //}
-
     public async Task<List<Habitaciones>> ListarConDetalles()
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
         return await _contexto.Habitaciones
-            .Include(h => h.TipoHabitaciones) // Incluye la relación con TipoHabitacion (si existe)
-            /*.Include(h => h.Reservas)*/ // Incluye reservas (si quieres relacionarlas)
+            .Include(h => h.TipoHabitaciones)
+            .Include(r => r.Reservas)
+            .Include(d => d.HabitacionDetalles)
             .ToListAsync();
     }
-
 
     public async Task<List<Habitaciones>> Listar(Expression<Func<Habitaciones, bool>> criterio)
     {
@@ -104,6 +92,7 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
 
         return await _contexto.Habitaciones
             .Include(h => h.TipoHabitaciones)
+            .Include(h => h.Reservas)
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();

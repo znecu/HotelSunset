@@ -1,7 +1,10 @@
 ﻿@page "/Reservas"
+
 @using System.Globalization
+@rendermode InteractiveServer
 @inject HabitacionesService habitacionesService
-@inject NavigationManager navigationManager
+@inject ReservasService reservasService
+
 <div class="container mt-4">
     <h2 class="text-center mb-4">Listado de Habitaciones Disponibles</h2>
 
@@ -9,18 +12,20 @@
     <div class="row mb-4">
         <div class="col-md-3">
             <label>Fecha de Inicio</label>
-            <InputDate @bind-Value="FechaInicio" class="form-control" />
+            <InputDate @bind-Value="reservas.FechaInicio" class="form-control"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
         </div>
         <div class="col-md-3">
             <label>Fecha Final</label>
-            <InputDate @bind-Value="FechaFinal" class="form-control" />
+            <InputDate @bind-Value="reservas.FechaFinal" class="form-control"
+                       min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
         </div>
-        @* <div class="col-md-3 align-self-end"> *@
-        @*     <button class="btn btn-primary" @onclick="AplicarFiltro">Filtrar Habitaciones</button> *@
-        @* </div> *@
-        @* <div class="col-md-3 align-self-end"> *@
-        @*     <button class="btn btn-secondary" @onclick="MostrarTodasHabitaciones">Restablecer</button> *@
-        @* </div> *@
+        <div class="col-md-3 align-self-end">
+            <button class="btn btn-primary" @onclick="FiltrarHabitaciones">Filtrar Habitaciones</button>
+        </div>
+        <div class="col-md-3 align-self-end">
+            <button class="btn btn-secondary" @onclick="Restablecer">Restablecer</button>
+        </div>
     </div>
 
     <!-- Tabla para mostrar las habitaciones -->
@@ -28,19 +33,19 @@
         <thead class="table-light">
             <tr>
                 <th>ID</th>
-                <th>Numero de habitacion</th>
+                <th>Número de Habitación</th>
                 <th>Tipo de Habitación</th>
-                <th>Descripcion</th>
+                <th>Descripción</th>
                 <th>Capacidad</th>
                 <th>Precio</th>
-                <th>Ver mas</th>
+                <th>Ver más</th>
             </tr>
         </thead>
         <tbody>
             @if (ListaHabitaciones.Count == 0)
             {
                 <tr>
-                    <td colspan="6" class="text-center">No hay habitaciones disponibles.</td>
+                    <td colspan="7" class="text-center">No hay habitaciones disponibles.</td>
                 </tr>
             }
             else
@@ -55,7 +60,7 @@
                         <td>@habitacion.Capacidad</td>
                         <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("es-ES"))</td>
                         <td>
-                            <a href="Reservas/Create">
+                            <a href="Reservas/Create/@habitacion.HabitacionId">
                                 <button type="button" class="btn btn-success">Ver</button>
                             </a>
                         </td>
@@ -66,47 +71,51 @@
     </table>
 </div>
 
+<p>@Mensaje</p>
+
 @code {
-
+    public Reservas reservas { get; set; } = new Reservas();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
-    public DateTime? FechaInicio { get; set; }
-    public DateTime? FechaFinal { get; set; }
-
-    public Reservas ReservaTemporal { get; set; } = new Reservas();
+    public string Mensaje { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
     }
 
-    // private async Task AplicarFiltro()
-    // {
-    //     if (FechaInicio.HasValue && FechaFinal.HasValue)
-    //     {
-    //         ListaHabitaciones = await habitacionesService.BuscarHabitacionDisponibles(FechaInicio.Value, FechaFinal.Value);
-    //     }
-    // }
-
-    // private async Task MostrarTodasHabitaciones()
-    // {
-    //     ListaHabitaciones = await habitacionesService.ListarConDetalles();
-    //     FechaInicio = null;
-    //     FechaFinal = null;
-    // }
-
-    private void AlmacenarFechas()
+    private async Task FiltrarHabitaciones()
     {
-        if (FechaInicio.HasValue && FechaFinal.HasValue)
+        if (reservas.FechaInicio.HasValue && reservas.FechaFinal.HasValue)
         {
-            ReservaTemporal.FechaInicio = FechaInicio.Value;
-            ReservaTemporal.FechaFinal = FechaFinal.Value;
+            if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
+            {
+                Mensaje = "La fecha de inicio no puede ser anterior a la fecha actual.";
+                return;
+            }
+
+            if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
+            {
+                Mensaje = "La fecha final no puede ser anterior a la fecha de inicio.";
+                return;
+            }
+
+            ListaHabitaciones = await habitacionesService.Listar(h =>
+                !h.Reservas.Any(r =>
+                    r.FechaInicio < reservas.FechaFinal.Value &&
+                    r.FechaFinal > reservas.FechaInicio.Value));
+
+            Mensaje = $"Habitaciones Disponibles: {ListaHabitaciones.Count}";
+        }
+        else
+        {
+            Mensaje = "Por favor, selecciona ambas fechas.";
         }
     }
 
-    private void NavegarAConfirmacionReserva()
+    private async Task Restablecer()
     {
-        AlmacenarFechas();  // Asegúrate de almacenar las fechas antes de navegar
-        navigationManager.NavigateTo("/Reservas/Create");  // Asegúrate de tener una ruta configurada
+        ListaHabitaciones = await habitacionesService.ListarConDetalles();
+        reservas.FechaInicio = null;
+        reservas.FechaFinal = null;
     }
-
 }
