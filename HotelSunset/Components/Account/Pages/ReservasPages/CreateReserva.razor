@@ -1,4 +1,4 @@
-﻿@page "/Reservas/Create"
+﻿@page "/Reservas/Create/{HabitacionId:int}"
 @using System.Globalization
 @inject HabitacionesService habitacionesService
 @inject ReservasService reservasServices
@@ -22,7 +22,14 @@
             @*Body*@
             <div class="card-body">
 
-                @*Fecha Inicio*@
+                @*Habitacion*@
+                @* <div class="col-2 mt-2">
+                    <label class="form-control"><strong>Habitacion</strong></label>
+                    <InputText class="form-control" @bind-Value="@Habitaciones.TipoHabitaciones.Descripcion"></InputText>
+                    <ValidationMessage For="(()=> Reservas.FechaInicio)" />
+                </div> *@
+
+                @* Fecha Inicio *@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>Fecha Inicio</strong></label>
                     <InputDate class="form-control" @bind-Value="@Reservas.FechaInicio"></InputDate>
@@ -96,7 +103,8 @@
 </EditForm>
 
 @code {
-
+    [Parameter]
+    public int HabitacionId { get; set; }
     public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
     public Reservas Reservas { get; set; } = new Reservas();
     public Habitaciones Habitaciones { get; set; } = new Habitaciones();
@@ -111,13 +119,21 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Habitaciones = await habitacionesService.Buscar(HabitacionId);
+        if (Habitaciones != null)
+        {
+            Reservas.HabitacionId = HabitacionId;
+        }
+        // TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
         ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
         ListaHabitaciones = await habitacionesService.Listar(a => true);
         ListaReservas = await reservasServices.Listar(r=> true);
+        Habitaciones = await habitacionesService.Buscar(Habitaciones.TipoHabitacionId);
     }
 
     public async Task Guardar()
     {
+        Mensaje = "Hola hola";
         var crear = await reservasServices.Guardar(Reservas);
 
         if (crear)
@@ -130,6 +146,7 @@
             Mensaje = "No se ha podido realizar la reserva. ";
         }
     }
+
 
     public void AgregarDetalle()
     {
@@ -178,6 +195,6 @@
     }
     public void Volver()
     {
-        navigationManager.NavigateTo("/GestionHotel/CrearHabitacion");
+        navigationManager.NavigateTo("/Reservas");
     }
 }
