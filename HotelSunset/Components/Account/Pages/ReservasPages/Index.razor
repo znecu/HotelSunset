@@ -80,30 +80,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Carga inicial de todas las habitaciones con detalles
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
     }
 
     private async Task FiltrarHabitaciones()
     {
-        // Validar que ambas fechas estén seleccionadas
         if (reservas.FechaInicio.HasValue && reservas.FechaFinal.HasValue)
         {
-            // Validar que la fecha de inicio no sea anterior a la fecha actual
             if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
             {
                 Mensaje = "La fecha de inicio no puede ser anterior a la fecha actual.";
                 return;
             }
 
-            // Validar que la fecha final no sea menor que la fecha de inicio
             if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
             {
                 Mensaje = "La fecha final no puede ser anterior a la fecha de inicio.";
                 return;
             }
 
-            // Filtrar habitaciones según la disponibilidad
             ListaHabitaciones = await habitacionesService.Listar(h =>
                 !h.Reservas.Any(r =>
                     r.FechaInicio < reservas.FechaFinal.Value &&
@@ -119,8 +114,6 @@
 
     private async Task Restablecer()
     {
-        // Restablecer la lista y limpiar filtros
-        Mensaje = "Se cargaron todas las habitaciones.";
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
         reservas.FechaInicio = null;
         reservas.FechaFinal = null;
