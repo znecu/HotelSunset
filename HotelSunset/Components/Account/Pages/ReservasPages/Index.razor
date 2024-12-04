@@ -1,77 +1,83 @@
 ﻿@page "/Reservas"
-
 @using System.Globalization
 @rendermode InteractiveServer
 @inject HabitacionesService habitacionesService
 @inject ReservasService reservasService
+@inject NavigationManager navigationManager
 
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Listado de Habitaciones Disponibles</h2>
+<PageTitle>Index</PageTitle>
+<EditForm Model="reservas" OnValidSubmit="FiltrarHabitaciones">
+    <DataAnnotationsValidator/>
 
-    <!-- Filtro por fechas -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <label>Fecha de Inicio</label>
-            <InputDate @bind-Value="reservas.FechaInicio" class="form-control"
-                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-        </div>
-        <div class="col-md-3">
-            <label>Fecha Final</label>
-            <InputDate @bind-Value="reservas.FechaFinal" class="form-control"
-                       min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
-        </div>
-        <div class="col-md-3 align-self-end">
-            <button class="btn btn-primary" @onclick="FiltrarHabitaciones">Filtrar Habitaciones</button>
-        </div>
-        <div class="col-md-3 align-self-end">
-            <button class="btn btn-secondary" @onclick="Restablecer">Restablecer</button>
-        </div>
-    </div>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Listado de Habitaciones Disponibles</h2>
 
-    <!-- Tabla para mostrar las habitaciones -->
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Número de Habitación</th>
-                <th>Tipo de Habitación</th>
-                <th>Descripción</th>
-                <th>Capacidad</th>
-                <th>Precio</th>
-                <th>Ver más</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (ListaHabitaciones.Count == 0)
-            {
+        <!-- Filtro por fechas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label>Fecha de Inicio</label>
+                <InputDate @bind-Value="reservas.FechaInicio" class="form-control"
+                           min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label>Fecha Final</label>
+                <InputDate @bind-Value="reservas.FechaFinal" class="form-control"
+                           min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3 align-self-end">
+                <button class="btn btn-primary" @onclick="FiltrarHabitaciones">Filtrar Habitaciones</button>
+            </div>
+            <div class="col-md-3 align-self-end">
+                <button class="btn btn-secondary" @onclick="Restablecer">Restablecer</button>
+            </div>
+        </div>
+
+        <!-- Tabla para mostrar las habitaciones -->
+        <table class="table table-bordered">
+            <thead class="table-light">
                 <tr>
-                    <td colspan="7" class="text-center">No hay habitaciones disponibles.</td>
+                    <th>ID</th>
+                    <th>Número de Habitación</th>
+                    <th>Tipo de Habitación</th>
+                    <th>Descripción</th>
+                    <th>Capacidad</th>
+                    <th>Precio</th>
+                    <th>Ver más</th>
                 </tr>
-            }
-            else
-            {
-                @foreach (var habitacion in ListaHabitaciones)
+            </thead>
+            <tbody>
+                @if (ListaHabitaciones.Count == 0)
                 {
                     <tr>
-                        <td>@habitacion.HabitacionId</td>
-                        <td>@habitacion.NumeroHabitacion</td>
-                        <td>@habitacion.TipoHabitaciones?.Categoria</td>
-                        <td>@habitacion.TipoHabitaciones?.Descripcion</td>
-                        <td>@habitacion.Capacidad</td>
-                        <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("es-ES"))</td>
-                        <td>
-                            <a href="Reservas/Create/@habitacion.HabitacionId">
-                                <button type="button" class="btn btn-success">Ver</button>
-                            </a>
-                        </td>
+                        <td colspan="7" class="text-center">No hay habitaciones disponibles.</td>
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
-</div>
+                else
+                {
+                    @foreach (var habitacion in ListaHabitaciones)
+                    {
+                        <tr>
+                            <td>@habitacion.HabitacionId</td>
+                            <td>@habitacion.NumeroHabitacion</td>
+                            <td>@habitacion.TipoHabitaciones?.Categoria</td>
+                            <td>@habitacion.TipoHabitaciones?.Descripcion</td>
+                            <td>@habitacion.Capacidad</td>
+                            <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("es-ES"))</td>
+                            <td>
+                                @* <a href="Reservas/Create/@habitacion.HabitacionId/@reservas.ReservaId"> *@
+                                @*     <button type="button" class="btn btn-success">Ver</button> *@
+                                @* </a> *@
+                                <button type="button" class="btn btn-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)">Ver</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <p>@Mensaje</p>
 
-<p>@Mensaje</p>
+</EditForm>
 
 @code {
     public Reservas reservas { get; set; } = new Reservas();
@@ -117,5 +123,19 @@
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
         reservas.FechaInicio = null;
         reservas.FechaFinal = null;
+    }
+
+    private void IrCrearReserva(int habitacionId)
+    {
+        if (!reservas.FechaInicio.HasValue || !reservas.FechaFinal.HasValue)
+        {
+            Mensaje = "Por favor, selecciona ambas fechas antes de continuar.";
+            return;
+        }
+        // navigationManager.NavigateTo($"Reservas/Create/{habitacionId}/{reservas.ReservaId}?fechaInicio={reservas.FechaInicio:yyyy-MM-dd}&fechaFinal={reservas.FechaFinal:yyyy-MM-dd}");
+        // navigationManager.NavigateTo($"Reservas/Create/{habitacionId}?fechaInicio={reservas.FechaInicio:yyyy-MM-dd}&fechaFinal={reservas.FechaFinal:yyyy-MM-dd}");
+        navigationManager.NavigateTo($"/Reservas/Create/{habitacionId}/{reservas.FechaInicio:yyyy-MM-dd}/{reservas.FechaFinal:yyyy-MM-dd}");
+
+
     }
 }
