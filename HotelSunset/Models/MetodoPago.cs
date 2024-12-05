@@ -8,11 +8,6 @@ public class MetodoPago
     [Key]
     public int MetodoPagoId { get; set; }
 
-    public int ClienteId { get; set; }
-    [ForeignKey("ClienteId")]
-    public Clientes? Clientes { get; set; }
-
-
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? NombresApellido { get; set; }
