@@ -79,6 +79,7 @@
         if (await Validar())
         {
             Notificacion(ToastType.Warning, "Creación de agregado", "Ya existe un agregado con esta descripción ");
+            return;
         }
 
         var crear = await agregadoService.Guardar(agregados);
