@@ -22,10 +22,11 @@ public class Clientes
     public string? Telefono { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "El correo electrónico no tiene un formato válido.")]
     public string? Email { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
-    public DateTime FechaRegistro { get; set; } = DateTime.Now;
+
 }

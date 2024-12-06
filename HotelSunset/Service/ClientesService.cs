@@ -27,6 +27,15 @@ namespace HotelSunset.Service
             return await _contexto.Clientes
                 .AnyAsync(c => c.ClienteId == clienteId);
         }
+
+        public async Task<bool> ExisteCliente(int clientesId, string nombres, string telefono, string email, string cedula)
+        {
+            await using var _contexto = await DbFactory.CreateDbContextAsync();
+            return await _contexto.Clientes
+                .AnyAsync(c => c.ClienteId != clientesId &&
+                (c.Nombres.ToLower().Equals(nombres.ToLower()) || c.Telefono.Equals(telefono) || c.Email.Equals(email) || c.Cedula.Equals(cedula)));
+        }
+
         private async Task<bool> Insertar(Clientes cliente)
         {
             await using var _contexto = await DbFactory.CreateDbContextAsync();

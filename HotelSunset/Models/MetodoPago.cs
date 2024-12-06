@@ -17,7 +17,7 @@ public class MetodoPago
     public string? NumeroTarjeta { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    [RegularExpression(@"^(0[1-9]|1[0-2])\/\d{4}$", ErrorMessage = "La fecha debe tener el formato MM/AAAA.")]
+    [RegularExpression(@"^(0[1-9]|1[0-2])/\d{4}$", ErrorMessage = "La fecha debe tener el formato MM/AAAA.")]
     public string? FechaExpiracion { get; set; }
 
     [RegularExpression(@"^\d{3}$", ErrorMessage = "El código de seguridad debe contener 3 dígitos.")]
