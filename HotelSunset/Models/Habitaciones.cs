@@ -13,13 +13,13 @@ public class Habitaciones
     public TipoHabitaciones? TipoHabitaciones { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    [RegularExpression("^^[a-zA-Z0-9\\-]+$", ErrorMessage = "Solo se permiten si.")]
+    [RegularExpression("^[A-Z]-\\d{3}$", ErrorMessage = "El formato de ser: una letra mayuscula, - y tres numeros. ")]
     public string? NumeroHabitacion { get; set; }
 
     public bool Estado { get; set; } = true;  //True = habitacion disposible / false Reservada
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    [Range(1, 999999, ErrorMessage = "Ingrese un número mayor que {1} y menor que {2}")]
+    [Range(1, 999999, ErrorMessage = "Ingrese un número mayor que {1} y menor que {2}. ")]
 
     public double PrecioBase { get; set; }
 

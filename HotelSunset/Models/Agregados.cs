@@ -12,10 +12,10 @@ namespace HotelSunset.Models
         public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio. ")]
-        [Range(1, double.MaxValue, ErrorMessage = "El precio es demasido alto para el sistema")]
+        [Range(1, 500000, ErrorMessage = "El precio debe ser entre 1 y 500,000")]
         public double Precio { get; set; }
 
-        [Range(1, 500, ErrorMessage = "La capacidad debe ser entre 1 y 500.")]
+        [Range(1, 500, ErrorMessage = "La exitencia debe ser entre 1 y 500.")]
         public int Existencia { get; set; }
     }
 }
