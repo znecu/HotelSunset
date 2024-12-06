@@ -3,6 +3,8 @@
 @layout EmptyLayout
 @inject TipoHabitacionService tipoHabitacionService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Create</PageTitle>
 <EditForm Model="TipoHabitaciones" OnValidSubmit="Guardar">
@@ -19,7 +21,7 @@
 
             @*Body*@
             <div class="card-body">
-            
+
                 @*Categoria*@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>Categor&iacute;a</strong></label>
@@ -41,18 +43,31 @@
                 </div>
             </div>
         </div>
-        </div>
-        @Mensaje
+    </div>
 </EditForm>
 @code {
     public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
 
     public async Task Guardar()
     {
         if (await Validar())
         {
-            Mensaje = "Ya existe un tipo de habitación con esta categoria.";
+            Notificacion(ToastType.Warning, "Creación de tipo de habitación", "Ya existe un tipo de habitación con esta descripción ");
             return;
         }
 
@@ -60,19 +75,20 @@
 
         if (crear)
         {
-            Mensaje = "Creado exitosamente.";
-            navigationManager.NavigateTo("/GestionHotel/TipoHabitacion");
+            Notificacion(ToastType.Success, "Creación de tipo de habitación", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
         }
 
         else
         {
-            Mensaje = "No se ha podido crear el tipo de habitación. ";
+            Notificacion(ToastType.Danger, "Creación de tipo de habitación", "No se pudo crear el tipo de habitación ");
         }
     }
 
     private async Task<bool> Validar()
     {
-        var existe = await tipoHabitacionService.ExisteTipoHabitacion(TipoHabitaciones.TipoHabitacionId,TipoHabitaciones.Categoria, TipoHabitaciones.Descripcion);
+        var existe = await tipoHabitacionService.ExisteTipoHabitacion(TipoHabitaciones.TipoHabitacionId, TipoHabitaciones.Categoria, TipoHabitaciones.Descripcion);
         return existe;
     }
 

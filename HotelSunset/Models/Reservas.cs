@@ -7,8 +7,13 @@ public class Reservas
 {
     [Key]
     public int ReservaId { get; set; }
-    public DateTime FechaInicio { get; set; }
-    public DateTime FechaFinal { get; set; }
+
+    public int HabitacionId { get; set; }
+    [ForeignKey("HabitacionId")]
+    public Habitaciones? Habitacion { get; set; }
+
+    public DateTime? FechaInicio { get; set; }
+    public DateTime? FechaFinal { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
 
@@ -17,5 +22,5 @@ public class Reservas
     public Clientes? Clientes { get; set; }
     
     public ICollection<ReservasDetalle> ReservasDetalles { get; set; } = new List<ReservasDetalle>();
-    public ICollection<HabitacionReserva> HabitacionReserva { get; set; } = new List<HabitacionReserva>();
+   
 }

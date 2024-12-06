@@ -3,6 +3,8 @@
 @layout EmptyLayout
 @inject ArticulosExtrasSerive articulosExtraSerive
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Edit</PageTitle>
 <EditForm Model="ArticulosExtras" OnValidSubmit="Editar">
@@ -48,25 +50,38 @@
             </div>
         </div>
     </div>
-    @Mensaje
 
 </EditForm>
 @code {
     [Parameter]
     public int ExtrasId { get; set; }
     public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
     {
         ArticulosExtras = await articulosExtraSerive.Buscar(ExtrasId);
     }
 
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
     public async Task Editar()
     {
         if (await Validar())
         {
-            Mensaje = "Ya existe un articulo extra con esta descripción.";
+            Notificacion(ToastType.Warning, "Editar articulo extra", "Ya existe un articulo extra con esta descripción ");
             return;
         }
 
@@ -74,12 +89,13 @@
 
         if (crear)
         {
-            Mensaje = "Se ha modificado correctamente. ";
+            Notificacion(ToastType.Success, "Editar articulo extra", "Se ha modificado correctamente ");
+            await Task.Delay(1500);
             Volver();
         }
         else
         {
-            Mensaje = "No se ha podido modificar. ";
+            Notificacion(ToastType.Danger, "Editar articulo extra", "No se pudo modificar el articulo extra ");
         }
     }
 

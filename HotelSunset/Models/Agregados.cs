@@ -8,7 +8,7 @@ namespace HotelSunset.Models
         public int AgregadoId { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio.")]
-        [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Solo se permiten letras y numeros.")]
+        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
         public string? Descripcion { get; set; }
 
         [Required(ErrorMessage = "Este campo es obligatorio. ")]

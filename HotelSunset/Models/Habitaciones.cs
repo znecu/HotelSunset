@@ -31,5 +31,5 @@ public class Habitaciones
 
     public ICollection<HabitacionDetalle> HabitacionDetalles { get; set; } = new List<HabitacionDetalle>();
 
-    public ICollection<HabitacionReserva> HabitacionReserva { get; set; } = new List<HabitacionReserva>();
+    public ICollection<Reservas> Reservas { get; set; } = new List<Reservas>();
 }

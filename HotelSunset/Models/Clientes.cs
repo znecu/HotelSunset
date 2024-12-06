@@ -13,7 +13,7 @@ public class Clientes
     public Reservas? Reservas { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio.")]
-    [RegularExpression(@"^[A-Za-z\s]+$", ErrorMessage = "Solo se permiten lestras en este campo.")]
+    [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? Nombres { get; set; }
 
 
@@ -29,5 +29,4 @@ public class Clientes
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
-    public ICollection<MetodoPago> MetodoPagos { get; set; } = new List<MetodoPago>();
 }

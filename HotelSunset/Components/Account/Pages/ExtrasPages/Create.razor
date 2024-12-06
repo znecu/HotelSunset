@@ -3,6 +3,8 @@
 @layout EmptyLayout
 @inject ArticulosExtrasSerive articulosExtraSerive
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Create</PageTitle>
 <EditForm Model="ArticulosExtras" OnValidSubmit="Guardar">
@@ -49,18 +51,31 @@
             </div>
         </div>
     </div>
-    @Mensaje
 
 </EditForm>
 @code {
     public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
 
     public async Task Guardar()
     {
         if (await Validar())
         {
-            Mensaje = "Ya existe un articulo extra con esta descripción.";
+           Notificacion(ToastType.Warning, "Creación de articulo extra", "Ya existe un articulo extra con esta descripción ");
             return;
         }
 
@@ -68,13 +83,15 @@
 
         if (crear)
         {
-            Mensaje = "Creado exitosamente.";
-            navigationManager.NavigateTo("/GestionHotel/Extras");
+            Notificacion(ToastType.Success, "Creación de articulo extra", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+
         }
 
         else
         {
-            Mensaje = "No se ha podido crear el articulo extra. ";
+            Notificacion(ToastType.Danger, "Creación de articulo extra", "No se pudo crear el articulo extra ");
         }
     }
 
