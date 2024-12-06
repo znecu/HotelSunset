@@ -28,5 +28,4 @@ public class Clientes
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
-    public ICollection<MetodoPago> MetodoPagos { get; set; } = new List<MetodoPago>();
 }
