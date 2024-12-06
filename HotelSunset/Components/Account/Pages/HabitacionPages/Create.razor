@@ -40,7 +40,7 @@
                 @*NumeroHabitacion*@
                 <div>
                     <label class="form-label">Número de habitación</label>
-                    <InputText class="form-control" @bind-Value="Habitaciones.NumeroHabitacion"></InputText>
+                    <InputText class="form-control" placeholder= "Ej: A-302" @bind-Value="Habitaciones.NumeroHabitacion"></InputText>
                     <ValidationMessage For="(()=> Habitaciones.NumeroHabitacion)" />
                 </div>
 
@@ -102,7 +102,7 @@
                 @*MontoTotal*@
                 <div>
                     <label class="form-label">Monto Total</label>
-                    <InputNumber class="form-control" @bind-Value="Habitaciones.MontoTotal" ReadOnly="true"></InputNumber>
+                    <InputNumber class="form-control" readonly @bind-Value="Habitaciones.MontoTotal" ></InputNumber>
                     <ValidationMessage For="(()=> Habitaciones.MontoTotal)" />
                 </div>
             </div>
