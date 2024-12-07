@@ -73,8 +73,10 @@
                         <tbody>
                             @foreach (var detalle in Reservas.ReservasDetalles)
                             {
+                                var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
+
                                 <tr>
-                                    <td>@detalle.ExtrasId</td>
+                                    <td>@articuloExtra?.Descripcion</td>
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
@@ -302,6 +304,7 @@
 
         DetalleSeleccionado = new ReservasDetalle();
     }
+
     public void Volver()
     {
         navigationManager.NavigateTo("/Reservas");
