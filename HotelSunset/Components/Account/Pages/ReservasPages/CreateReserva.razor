@@ -48,6 +48,7 @@
                 <div class="border border-success p-3 mt-3">
                     <h5>Detalle de Reserva</h5>
                     <div class="input-group align-items-center mt-2">
+
                         <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.ExtrasId>
                             <option value="0" selected disabled>Seleccione un articulo extra</option>
                             @foreach (var extra in ListaArticulosExtras)
@@ -80,7 +81,6 @@
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
-
                                         <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
                                     </td>
                                 </tr>
@@ -238,7 +238,6 @@
 
     public async Task Guardar()
     {
-        await modal.ShowAsync();
         Cliente.Reservas = Reservas;
         var cliente = await clientesService.Guardar(Cliente);
         var reserva = await reservasServices.Guardar(Reservas);
@@ -246,6 +245,7 @@
 
         if (reserva && metodoPago && cliente)
         {
+            await modal.ShowAsync();
             Notificacion(ToastType.Success, "Reserva", "Se ha creado correctamente ");
             await Task.Delay(1500);
         }
