@@ -9,12 +9,12 @@
 
 <PageTitle>Index</PageTitle>
 <EditForm Model="reservas" OnValidSubmit="FiltrarHabitaciones">
-    <DataAnnotationsValidator/>
+    <DataAnnotationsValidator />
 
     <div class="container mt-4">
-        <h2 class="text-center mb-4">Listado de Habitaciones Disponibles</h2>
+        <h2 class="text-center mb-4">Seleccionar alojamiento</h2>
 
-        @* Filtro por fechas  *@
+        @* Filtro por fechas *@
         <div class="row mb-4">
             <div class="col-md-3">
                 <label>Fecha de Inicio</label>
@@ -27,64 +27,59 @@
                            min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-md-3 align-self-end">
-                <button class="btn btn-primary" @onclick="FiltrarHabitaciones">Filtrar Habitaciones</button>
+                <button class="btn btn-outline-primary" @onclick="FiltrarHabitaciones"><Icon Name="IconName.Search"></Icon></button>
             </div>
             <div class="col-md-3 align-self-end">
-                <button class="btn btn-secondary" @onclick="Restablecer">Restablecer</button>
+                <button class="btn btn-outline-secondary" @onclick="Restablecer"><Icon Name="IconName.ArrowClockwise"></Icon></button>
             </div>
         </div>
 
-         @* Tabla para mostrar las habitaciones *@
-        <table class="table table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Número de Habitación</th>
-                    <th>Tipo de Habitación</th>
-                    <th>Descripción</th>
-                    <th>Capacidad</th>
-                    <th>Precio</th>
-                    <th>Ver más</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (ListaHabitaciones.Count == 0)
+        <div class="habitaciones-container">
+            @if (ListaHabitaciones.Count == 0)
+            {
+                <div class="text-center">No hay habitaciones disponibles.</div>
+            }
+            else
+            {
+                @foreach (var habitacion in ListaHabitaciones)
                 {
-                    <tr>
-                        <td colspan="7" class="text-center">No hay habitaciones disponibles.</td>
-                    </tr>
+                    <div class="habitacion-card">
+
+                        @* Imagen de la habitación *@
+
+                        <div class="habitacion-image">
+                            @if (!string.IsNullOrEmpty(habitacion.ImagenUrl))
+                            {
+                                <img src="@habitacion.ImagenUrl" alt="Imagen de la habitación" />
+                            }                            
+                        </div>
+                        
+                        @*Detalles de la habitación *@
+                        <div class="habitacion-detalle">
+                            <h4>@habitacion.TipoHabitaciones?.Categoria</h4>
+                            <p>@habitacion.TipoHabitaciones?.Descripcion</p>
+                            <p><strong>Capacidad:</strong> @habitacion.Capacidad</p>
+                            <p><strong>Agregados:</strong> </p>
+                            <p><strong>Precio:</strong> @habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+                            <button type="button" class="btn btn-outline-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)"> Reservar</button>
+                        </div>
+                    </div>
                 }
-                else
-                {
-                    @foreach (var habitacion in ListaHabitaciones)
-                    {
-                        <tr>
-                            <td>@habitacion.HabitacionId</td>
-                            <td>@habitacion.NumeroHabitacion</td>
-                            <td>@habitacion.TipoHabitaciones?.Categoria</td>
-                            <td>@habitacion.TipoHabitaciones?.Descripcion</td>
-                            <td>@habitacion.Capacidad</td>
-                            <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
-                            <td>
-                                <button type="button" class="btn btn-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)">Ver</button>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-        @*Footer*@
-        <div class="footer">
+            }
+        </div>
+
+        @* Footer *@
+        <div class="footer mt-4">
             <p><strong>Cantidad de habitaciones disponibles: </strong>@ListaHabitaciones.Count</p>
         </div>
     </div>
-
 </EditForm>
 
 @code {
     public Reservas reservas { get; set; } = new Reservas();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
     public List<ToastMessage> Mensaje { get; set; } = [];
+    public List<Agregados> ListaAgregados { get; set; } = new List<Agregados>();
     public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
@@ -110,25 +105,25 @@
         if (reservas.FechaInicio.HasValue && reservas.FechaFinal.HasValue)
         {
             if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
-            {         
+            {
                 return;
             }
 
             if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
-            {           
+            {
                 return;
             }
 
             ListaHabitaciones = await habitacionesService.Listar(h =>
                 !h.Reservas.Any(r =>
                     r.FechaInicio < reservas.FechaFinal.Value &&
-                    r.FechaFinal > reservas.FechaInicio.Value));         
+                    r.FechaFinal > reservas.FechaInicio.Value));
         }
-        
+
         else
         {
             Notificacion(ToastType.Warning, "Hotel Sunset", "Por favor, seleccione ambas fechas");
-            
+
         }
     }
 
