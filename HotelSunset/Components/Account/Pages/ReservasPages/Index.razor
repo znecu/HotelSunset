@@ -4,6 +4,8 @@
 @inject HabitacionesService habitacionesService
 @inject ReservasService reservasService
 @inject NavigationManager navigationManager
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+@inject ToastService toastService
 
 <PageTitle>Index</PageTitle>
 <EditForm Model="reservas" OnValidSubmit="FiltrarHabitaciones">
@@ -12,7 +14,7 @@
     <div class="container mt-4">
         <h2 class="text-center mb-4">Listado de Habitaciones Disponibles</h2>
 
-        <!-- Filtro por fechas -->
+        @* Filtro por fechas  *@
         <div class="row mb-4">
             <div class="col-md-3">
                 <label>Fecha de Inicio</label>
@@ -32,7 +34,7 @@
             </div>
         </div>
 
-        <!-- Tabla para mostrar las habitaciones -->
+         @* Tabla para mostrar las habitaciones *@
         <table class="table table-bordered">
             <thead class="table-light">
                 <tr>
@@ -64,9 +66,6 @@
                             <td>@habitacion.Capacidad</td>
                             <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                             <td>
-                                @* <a href="Reservas/Create/@habitacion.HabitacionId/@reservas.ReservaId"> *@
-                                @*     <button type="button" class="btn btn-success">Ver</button> *@
-                                @* </a> *@
                                 <button type="button" class="btn btn-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)">Ver</button>
                             </td>
                         </tr>
@@ -75,18 +74,31 @@
             </tbody>
         </table>
     </div>
-    <p>@Mensaje</p>
 
 </EditForm>
 
 @code {
     public Reservas reservas { get; set; } = new Reservas();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
-    public string Mensaje { get; set; } = string.Empty;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
     protected override async Task OnInitializedAsync()
     {
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
     }
 
     private async Task FiltrarHabitaciones()
@@ -95,13 +107,15 @@
         {
             if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
             {
-                Mensaje = "La fecha de inicio no puede ser anterior a la fecha actual.";
+                Notificacion(ToastType.Success, "Hotel Sunset", "La fecha de inicio no puede ser anterior a la fecha actual");
+                await Task.Delay(1500);
                 return;
             }
 
             if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
             {
-                Mensaje = "La fecha final no puede ser anterior a la fecha de inicio.";
+                Notificacion(ToastType.Success, "Hotel Sunset", "La fecha final no puede ser anterior a la fecha de inicio");
+                await Task.Delay(1500);
                 return;
             }
 
@@ -110,11 +124,14 @@
                     r.FechaInicio < reservas.FechaFinal.Value &&
                     r.FechaFinal > reservas.FechaInicio.Value));
 
-            Mensaje = $"Habitaciones Disponibles: {ListaHabitaciones.Count}";
+            Notificacion(ToastType.Success, "Hotel Sunset", "$Habitaciones Disponibles: {ListaHabitaciones.Count}");
+            await Task.Delay(1500);
         }
+        
         else
         {
-            Mensaje = "Por favor, selecciona ambas fechas.";
+            Notificacion(ToastType.Success, "Hotel Sunset", "Por favor, seleccione ambas fechas");
+            await Task.Delay(1500);
         }
     }
 
@@ -125,17 +142,14 @@
         reservas.FechaFinal = null;
     }
 
-    private void IrCrearReserva(int habitacionId)
+    private async Task IrCrearReserva(int habitacionId)
     {
         if (!reservas.FechaInicio.HasValue || !reservas.FechaFinal.HasValue)
         {
-            Mensaje = "Por favor, selecciona ambas fechas antes de continuar.";
+            Notificacion(ToastType.Success, "Hotel Sunset", "Por favor, selecciona ambas fechas antes de continuar");
+            await Task.Delay(1500);
             return;
         }
-        // navigationManager.NavigateTo($"Reservas/Create/{habitacionId}/{reservas.ReservaId}?fechaInicio={reservas.FechaInicio:yyyy-MM-dd}&fechaFinal={reservas.FechaFinal:yyyy-MM-dd}");
-        // navigationManager.NavigateTo($"Reservas/Create/{habitacionId}?fechaInicio={reservas.FechaInicio:yyyy-MM-dd}&fechaFinal={reservas.FechaFinal:yyyy-MM-dd}");
         navigationManager.NavigateTo($"/Reservas/Create/{habitacionId}/{reservas.FechaInicio:yyyy-MM-dd}/{reservas.FechaFinal:yyyy-MM-dd}");
-
-
     }
 }
