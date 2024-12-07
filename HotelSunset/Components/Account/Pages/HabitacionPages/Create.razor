@@ -1,10 +1,10 @@
 ﻿@page "/CrearHabitacion/Create"
-@using System.Globalization
 @layout EmptyLayout
 @inject HabitacionesService habitacionesService
 @inject TipoHabitacionService tipoHabitacionService
 @inject HabitacionesDetalleService habitacionDetalleService
 @inject AgregadosServices agregadosService
+@inject BlobServiceClient blobService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 @inject ToastService toastService
@@ -40,7 +40,7 @@
                 @*NumeroHabitacion*@
                 <div>
                     <label class="form-label">Número de habitación</label>
-                    <InputText class="form-control" placeholder= "Ej: A-302" @bind-Value="Habitaciones.NumeroHabitacion"></InputText>
+                    <InputText class="form-control" placeholder="Ej: A-302" @bind-Value="Habitaciones.NumeroHabitacion"></InputText>
                     <ValidationMessage For="(()=> Habitaciones.NumeroHabitacion)" />
                 </div>
 
@@ -56,6 +56,13 @@
                     <label class="form-label">Capacidad</label>
                     <InputNumber class="form-control" @bind-Value="Habitaciones.Capacidad"></InputNumber>
                     <ValidationMessage For="(()=> Habitaciones.Capacidad)" />
+                </div>
+
+                @*Imagen*@
+                <div class="col-6">
+                    <label class="form-label" for="imagenUrl"><strong>Seleccione la Imagen del Producto</strong></label>
+                    <InputFile OnChange="CargarImagen" />
+                    <ValidationMessage For="@(() => Habitaciones.ImagenUrl)" />
                 </div>
 
                 @*Detalle*@
@@ -102,7 +109,7 @@
                 @*MontoTotal*@
                 <div>
                     <label class="form-label">Monto Total</label>
-                    <InputNumber class="form-control" readonly @bind-Value="Habitaciones.MontoTotal" ></InputNumber>
+                    <InputNumber class="form-control" readonly @bind-Value="Habitaciones.MontoTotal"></InputNumber>
                     <ValidationMessage For="(()=> Habitaciones.MontoTotal)" />
                 </div>
             </div>
@@ -133,6 +140,7 @@
         ListaHabitaciones = await habitacionesService.Listar(t => true);
         ListaAgregados = await agregadosService.Listar(t => true);
         ListaHabitacionDetalle = await habitacionDetalleService.Listar(t => true);
+        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
     }
 
     private ToastMessage ShowToast(ToastType toastType, string title, string message)
@@ -208,8 +216,34 @@
 
         DetalleSeleccionado = new HabitacionDetalle();
     }
+
     public void Volver()
     {
         navigationManager.NavigateTo("/GestionHotel/CrearHabitacion");
+    }
+
+    private async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var imageFile = e.File;
+
+            if (imageFile != null)
+            {
+                var containerClient = blobService.GetBlobContainerClient("imagenes");
+                var blobClient = containerClient.GetBlobClient(imageFile.Name);
+
+                await using var stream = imageFile.OpenReadStream();
+                await blobClient.UploadAsync(stream, true);
+
+                Habitaciones.ImagenUrl = blobClient.Uri.ToString();
+
+                Console.WriteLine($"URL de la imagen: {Habitaciones.ImagenUrl}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Notificacion(ToastType.Danger, "Error al cargar imagen", ex.Message);
+        }
     }
 }
