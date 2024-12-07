@@ -37,9 +37,11 @@
                     <br />
                     <strong>Fecha Final: </strong> @Reservas.FechaFinal?.ToString("yyyy-MM-dd")
                     <br />
-                    <strong>Capacidad: </strong> @Habitaciones.Capacidad
+                    <strong>Noches Transcurridas: </strong> @CantidadNoches
                     <br />
-                    <strong>Precio Base: </strong> @Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
+                    <strong>Capacidad de personas: </strong> @Habitaciones.Capacidad
+                    <br />
+                    <strong>Precio base: </strong> @Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
                 </div>
 
                 @*Detalle*@
@@ -202,6 +204,9 @@
 
     public Clientes Cliente { get; set; } = new Clientes();
 
+    public TimeSpan NochesTranscurridas => Reservas.FechaFinal.Value - Reservas.FechaInicio.Value;
+
+    public int CantidadNoches;
     public List<ToastMessage> Mensaje { get; set; } = [];
     public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
@@ -217,10 +222,16 @@
         {
             Reservas.FechaInicio = DateTime.ParseExact(FechaInicio, "yyyy-MM-dd", CultureInfo.InvariantCulture);
             Reservas.FechaFinal = DateTime.ParseExact(FechaFinal, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
         }
 
         ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
         TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
+
+        CantidadNoches = (Reservas.FechaFinal - Reservas.FechaInicio)?.Days ?? 0;
+        Habitaciones.MontoTotal *= CantidadNoches;
+        Reservas.Total = Habitaciones.MontoTotal;
+
     }
 
     public async Task Guardar()
