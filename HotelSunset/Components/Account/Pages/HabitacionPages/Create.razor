@@ -80,7 +80,7 @@
                         <label class="col-form-label input-group-text">Cantidad:</label>
                         <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
 
-                        <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle>Agregar</button>
+                        <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle> Agregar</button>
                     </div>
 
                     <table class="table table-bordered mt-3">
@@ -99,7 +99,7 @@
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
-                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
+                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-outline-danger bi bi-trash"> Remover</button>
                                     </td>
                                 </tr>
                             }
