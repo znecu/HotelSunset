@@ -1,0 +1,62 @@
+﻿.habitaciones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.habitacion-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    gap: 20px;
+}
+
+.habitacion-image img {
+    width: 350px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.habitacion-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    .habitacion-detalle h4 {
+        margin: 0;
+        color: black;
+    }
+
+    .habitacion-detalle p {
+        margin: 0;
+        color: #555;
+    }
+
+    .habitacion-detalle button {
+        padding: 10px 20px;
+        background-color: #b6a579;
+        width: 100px;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .habitacion-detalle button:hover {
+            background-color: #555;
+        }
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+}
