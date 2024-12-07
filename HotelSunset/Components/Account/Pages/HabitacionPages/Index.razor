@@ -50,7 +50,12 @@
                             <td>@habitacion.NumeroHabitacion</td>
                             <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                             <td>@habitacion.Capacidad</td>
-                            <td>@habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            <td>
+                                @(habitacion.MontoTotal > habitacion.PrecioBase
+                                    ? habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
+                                    : habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
+                                    )
+                            </td>
 
                             @*Editar*@
                             <td>
@@ -75,6 +80,7 @@
 
 
 @code {
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
     public List<TipoHabitaciones> ListaTipoHabitaciones { get; set; } = new List<TipoHabitaciones>();
     public string Filtro { get; set; } = string.Empty;
@@ -84,5 +90,6 @@
     {
         ListaHabitaciones = await habitacionesService.Listar(t => t.TipoHabitacionId > 0);
         ListaTipoHabitaciones = await tipoHabitacionService.Listar(t => t.TipoHabitacionId > 0);
+        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
     }
 }
