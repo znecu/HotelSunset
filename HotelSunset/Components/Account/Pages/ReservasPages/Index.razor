@@ -73,6 +73,10 @@
                 }
             </tbody>
         </table>
+        @*Footer*@
+        <div class="footer">
+            <p><strong>Cantidad de habitaciones disponibles: </strong>@ListaHabitaciones.Count</p>
+        </div>
     </div>
 
 </EditForm>
@@ -106,32 +110,25 @@
         if (reservas.FechaInicio.HasValue && reservas.FechaFinal.HasValue)
         {
             if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
-            {
-                Notificacion(ToastType.Success, "Hotel Sunset", "La fecha de inicio no puede ser anterior a la fecha actual");
-                await Task.Delay(1500);
+            {         
                 return;
             }
 
             if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
-            {
-                Notificacion(ToastType.Success, "Hotel Sunset", "La fecha final no puede ser anterior a la fecha de inicio");
-                await Task.Delay(1500);
+            {           
                 return;
             }
 
             ListaHabitaciones = await habitacionesService.Listar(h =>
                 !h.Reservas.Any(r =>
                     r.FechaInicio < reservas.FechaFinal.Value &&
-                    r.FechaFinal > reservas.FechaInicio.Value));
-
-            Notificacion(ToastType.Success, "Hotel Sunset", "$Habitaciones Disponibles: {ListaHabitaciones.Count}");
-            await Task.Delay(1500);
+                    r.FechaFinal > reservas.FechaInicio.Value));         
         }
         
         else
         {
-            Notificacion(ToastType.Success, "Hotel Sunset", "Por favor, seleccione ambas fechas");
-            await Task.Delay(1500);
+            Notificacion(ToastType.Warning, "Hotel Sunset", "Por favor, seleccione ambas fechas");
+            
         }
     }
 
