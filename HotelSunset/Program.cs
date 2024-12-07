@@ -6,6 +6,7 @@ using HotelSunset.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+//Blob 
+var storageConnection = builder.Configuration["ConnectionStrings:HotelSunset:Storage"];
+
+builder.Services.AddAzureClients(azureBuilder => {
+    azureBuilder.AddBlobServiceClient(storageConnection);
+});
 
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<AgregadosServices>();
