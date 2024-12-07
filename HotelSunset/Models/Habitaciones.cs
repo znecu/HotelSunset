@@ -29,6 +29,8 @@ public class Habitaciones
 
     public double MontoTotal { get; set; }
 
+    public string? ImagenUrl { get; set; }
+
     public ICollection<HabitacionDetalle> HabitacionDetalles { get; set; } = new List<HabitacionDetalle>();
 
     public ICollection<Reservas> Reservas { get; set; } = new List<Reservas>();
