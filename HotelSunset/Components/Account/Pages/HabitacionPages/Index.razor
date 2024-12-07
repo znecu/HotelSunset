@@ -17,7 +17,7 @@
         @*Body*@
         <div class="card-body">
             <div class="row">
-              
+
                 @*Crear*@
                 <div class="col text-end">
                     <a href="/CrearHabitacion/Create">
@@ -31,11 +31,11 @@
                 <thead>
                     <tr>
                         <th>Habitaci&oacute;nId</th>
-                        <th>TipoHabitaci&oacute;n</th>
+                        <th>Categoria</th>
                         <th>N&uacute;meroHabitaci&oacute;n</th>
                         <th>PrecioBase</th>
                         <th>Capacidad</th>
-                        <th>MontoTotal</th>
+                        <th>Precio + agregado</th>
                         <th>Editar</th>
                         <th>Eliminar</th>
 
@@ -46,7 +46,7 @@
                     {
                         <tr>
                             <td>@habitacion.HabitacionId</td>
-                            <td>@habitacion.TipoHabitacionId</td>
+                            <td>@habitacion.TipoHabitaciones?.Categoria</td>
                             <td>@habitacion.NumeroHabitacion</td>
                             <td>@habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                             <td>@habitacion.Capacidad</td>

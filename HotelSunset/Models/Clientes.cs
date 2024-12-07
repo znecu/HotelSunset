@@ -16,7 +16,6 @@ public class Clientes
     [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
     public string? Nombres { get; set; }
 
-
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^(809|829|849|853|862)-[0-9]{7}$", ErrorMessage = "El número de teléfono debe ser válido y tener el formato correcto (ej. 809-1234567).")]
     public string? Telefono { get; set; }
@@ -28,5 +27,4 @@ public class Clientes
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
-
 }
