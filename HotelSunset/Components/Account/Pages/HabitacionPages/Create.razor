@@ -86,7 +86,7 @@
                     <table class="table table-bordered mt-3">
                         <thead>
                             <tr>
-                                <th>Agregado</th>
+                                <th>Agregados</th>
                                 <th>Cantidad</th>
                                 <th>Precio</th>
                             </tr>
@@ -94,8 +94,9 @@
                         <tbody>
                             @foreach (var detalle in Habitaciones.HabitacionDetalles)
                             {
+                                var agregados = ListaAgregados.FirstOrDefault(a => a.AgregadoId == detalle.AgregadoId);
                                 <tr>
-                                    <td>@detalle.AgregadoId</td>
+                                    <td>@agregados.Descripcion</td>
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
@@ -108,9 +109,8 @@
                 </div>
                 @*MontoTotal*@
                 <div>
-                    <label class="form-label">Monto Total</label>
-                    <InputNumber class="form-control" readonly @bind-Value="Habitaciones.MontoTotal"></InputNumber>
-                    <ValidationMessage For="(()=> Habitaciones.MontoTotal)" />
+                    <label class="form-label"><strong>Monto Total</strong></label>
+                    <label class="form-control" readonly>@Habitaciones.MontoTotal.ToString("N2")</label>
                 </div>
             </div>
 
@@ -126,6 +126,7 @@
 @code {
     public Habitaciones Habitaciones { get; set; } = new Habitaciones();
     public Agregados Agregados { get; set; } = new Agregados();
+    public Reservas Reservas { get; set; } = new Reservas();
     public HabitacionDetalle DetalleSeleccionado { get; set; } = new HabitacionDetalle();
     public List<TipoHabitaciones> ListaTipoHabitaciones { get; set; } = new();
     public List<HabitacionDetalle> ListaHabitacionDetalle { get; set; } = new();
@@ -138,6 +139,7 @@
     {
         ListaTipoHabitaciones = await tipoHabitacionService.Listar(t => true);
         ListaHabitaciones = await habitacionesService.Listar(t => true);
+        ListaAgregados = await agregadosService.Listar(t => true);
         ListaAgregados = await agregadosService.Listar(t => true);
         ListaHabitacionDetalle = await habitacionDetalleService.Listar(t => true);
         Habitaciones.MontoTotal = Habitaciones.PrecioBase;
@@ -193,15 +195,21 @@
                     Cantidad = DetalleSeleccionado.Cantidad
                 });
 
-            Habitaciones.MontoTotal = Habitaciones.PrecioBase;
-            foreach (var detalle in Habitaciones.HabitacionDetalles)
-            {
-                Habitaciones.MontoTotal += detalle.Precio;
-            }
-
+            ActualizarMontoTotal();
             DetalleSeleccionado = new HabitacionDetalle();
         }
     }
+
+    public void ActualizarMontoTotal()
+    {
+        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
+
+        foreach (var detalle in Habitaciones.HabitacionDetalles)
+        {
+            Habitaciones.MontoTotal += detalle.Precio;
+        }
+    }
+    
 
     public void RemoverDetalle(HabitacionDetalle eliminarDetalle)
     {
