@@ -12,6 +12,6 @@ public class TipoHabitaciones
     public string? Categoria { get; set; }
 
     [Required(ErrorMessage = "Este campo es obligatorio")]
-    [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "Solo se permiten letras, espacios y acentos.")]
+    [RegularExpression(@"^[\p{L}\s,]+$", ErrorMessage = "Solo se permiten letras, espacios, comas y acentos.")]
     public string? Descripcion { get; set; }
 }
