@@ -27,4 +27,8 @@ public class Clientes
     [Required(ErrorMessage = "Este campo es obligatorio.")]
     [RegularExpression(@"^\d{11}$", ErrorMessage = "La cédula debe tener 11 dígitos.")]
     public string? Cedula { get; set; }
+
+    public int TarjetaId { get; set; }
+    [ForeignKey("TarjetaId")]
+    public Tarjetas? Tarjeta { get; set; }
 }
