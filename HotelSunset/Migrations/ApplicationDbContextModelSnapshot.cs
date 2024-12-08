@@ -211,6 +211,9 @@ namespace HotelSunset.Migrations
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ImagenUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("MontoTotal")
                         .HasColumnType("float");
 

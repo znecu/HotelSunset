@@ -82,7 +82,7 @@
                                 <td>@detalle.Cantidad</td>
                                 <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                 <td>
-                                    <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
+                                    <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash" type="button">Remover</button>
                                 </td>
                             </tr>
                         }
@@ -293,6 +293,8 @@
     {
         Reservas.ReservasDetalles.Remove(eliminarDetalle);
 
+        DetalleSeleccionado.ExtrasId = eliminarDetalle.ExtrasId;
+        DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;
         Reservas.Total = Habitaciones.MontoTotal;
 
         foreach (var detalle in Reservas.ReservasDetalles)
@@ -300,8 +302,9 @@
             Reservas.Total += detalle.Precio;
         }
 
-        DetalleSeleccionado = new ReservasDetalle();
+        // DetalleSeleccionado = new ReservasDetalle();
     }
+
     public void Volver()
     {
         navigationManager.NavigateTo("/Reservas");

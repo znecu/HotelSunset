@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelSunset.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241207024831_Usuario5")]
+    [Migration("20241207214505_Usuario5")]
     partial class Usuario5
     {
         /// <inheritdoc />
@@ -213,6 +213,9 @@ namespace HotelSunset.Migrations
 
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ImagenUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("MontoTotal")
                         .HasColumnType("float");
