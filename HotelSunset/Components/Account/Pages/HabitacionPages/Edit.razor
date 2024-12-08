@@ -198,8 +198,9 @@
         }
     }
 
-    public void RemoverDetalle(HabitacionDetalle eliminarDetalle)
+    public async Task RemoverDetalle(HabitacionDetalle eliminarDetalle)
     {
+        var detalleEliminado = await habitacionesService.EliminarDetalle(eliminarDetalle.HabitacionDetalleId);
         Habitaciones.HabitacionDetalles.Remove(eliminarDetalle);
         DetalleSeleccionado.AgregadoId = eliminarDetalle.AgregadoId;
         DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;

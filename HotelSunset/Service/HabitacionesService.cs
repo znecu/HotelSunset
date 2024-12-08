@@ -27,11 +27,30 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
         return await _contexto.Habitaciones
             .AnyAsync(c => c.HabitacionId == habitacionId);
     }
-    private async Task<bool> Insertar(Habitaciones habitacion)
+    private async Task<bool> Insertar(Habitaciones habitaciones)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        _contexto.Habitaciones.Add(habitacion);
+        foreach (var habitacion in habitaciones.HabitacionDetalles)
+        {
+            var agregados = await BuscarAgregados(habitacion.AgregadoId);
+
+            if (agregados != null)
+            {
+                if (agregados.Existencia < habitacion.Cantidad)
+                {
+                    return false;
+                }
+                agregados.Existencia -= habitacion.Cantidad;
+                _contexto.Agregados.Update(agregados);
+                await _contexto.SaveChangesAsync();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        _contexto.Habitaciones.Add(habitaciones);
         return await _contexto.SaveChangesAsync() > 0;
     }
 
@@ -44,14 +63,32 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
 
     }
 
-    public async Task<bool> Eliminar(Habitaciones habitacion)
+    public async Task<bool> Eliminar(Habitaciones habitaciones)
     {
         await using var _contexto = await DbFactory.CreateDbContextAsync();
 
-        return await _contexto.Habitaciones
-            .AsNoTracking()
-            .Where(c => c.HabitacionId == habitacion.HabitacionId)
-            .ExecuteDeleteAsync() > 0;
+        var detalles = await BuscarDetalle(habitaciones.HabitacionId);
+
+        foreach (var detalle in detalles)
+        {
+            var agregado = await BuscarAgregados(detalle.AgregadoId);
+            if (agregado != null)
+            {
+                agregado.Existencia += detalle.Cantidad;
+                await ActualizarAgregados(agregado);
+            }
+        }
+        var habitacion = await _contexto.Habitaciones
+                    .Include(c => c.HabitacionDetalles)
+                    .FirstOrDefaultAsync(c => c.HabitacionId == habitaciones.HabitacionId);
+
+        if (habitacion == null) return false;
+
+        _contexto.HabitacionDetalle.RemoveRange(habitacion.HabitacionDetalles);
+        _contexto.Habitaciones.Remove(habitacion);
+
+        var cantidad = await _contexto.SaveChangesAsync();
+        return cantidad > 0;
     }
 
     public async Task<Habitaciones?> Buscar(int habitacionId)
@@ -64,6 +101,13 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
             .Include(r => r.Reservas)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.HabitacionId == habitacionId);
+    }
+    public async Task<Agregados> BuscarAgregados(int id)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        return await _contexto.Agregados
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.AgregadoId == id);
     }
 
     public async Task<List<HabitacionDetalle>> BuscarDetalle(int id)
@@ -97,5 +141,55 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();
+    }
+
+    public async Task<bool> ActualizarAgregados(Agregados agregado)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        _contexto.Agregados.Update(agregado);
+        return await _contexto
+            .SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> EliminarDetalle(int detalleId)
+    {
+        await using var _contexto = await DbFactory.CreateDbContextAsync();
+        if (await ExisteDetalle(detalleId))
+        {
+            var habitacionDetalle = await _contexto.HabitacionDetalle.FirstOrDefaultAsync(h => h.HabitacionDetalleId == detalleId);
+
+            var agregado = await _contexto.Agregados.FindAsync(habitacionDetalle.AgregadoId);
+
+            if (agregado is null)
+            {
+                return false;
+            }
+            else
+            {
+                agregado.Existencia += habitacionDetalle.Cantidad;
+                _contexto.Agregados.Update(agregado);
+            }
+            _contexto.HabitacionDetalle.Remove(habitacionDetalle);
+        }
+
+        else
+        {
+            var habitaciones = await _contexto.HabitacionDetalle.FirstOrDefaultAsync(h => h.HabitacionDetalleId == detalleId);
+
+            if (habitaciones is null)
+            {
+                return false;
+            }
+
+            _contexto.HabitacionDetalle.Remove(habitaciones);
+        }
+
+        return await _contexto.SaveChangesAsync() > 0;
+    }
+
+    private async Task<bool> ExisteDetalle(int detalleId)
+    {
+        await using var _context = await DbFactory.CreateDbContextAsync();
+        return await _context.HabitacionDetalle.AnyAsync(ed => ed.HabitacionDetalleId == detalleId);
     }
 }
