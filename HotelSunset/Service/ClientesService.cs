@@ -68,8 +68,14 @@ namespace HotelSunset.Service
             await using var _contexto = await DbFactory.CreateDbContextAsync();
 
             return await _contexto.Clientes
+                .Include(c => c.ClienteId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClienteId == clienteId);
+        }
+        public async Task<Clientes?> Obtener(Expression<Func<Clientes, bool>> criterio)
+        {
+            await using var _contexto = await DbFactory.CreateDbContextAsync();
+            return await _contexto.Clientes.AsNoTracking().FirstOrDefaultAsync(criterio);
         }
 
         public async Task<bool> ExisteCliente(int clienteId, string nombre, string email, string cedula)
