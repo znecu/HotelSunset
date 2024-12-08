@@ -16,171 +16,169 @@
 <EditForm Model="Reservas" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
 
-    <div class="container">
-        <div class="shadow-lg">
+    <div class="main-container">
+        <h1>Finalizar reserva</h1>
+        <div class="container-volver">
+            <button type="button" class="bi-chevron-left" @onclick="Volver"></button>
+        </div>
 
-            @*Header*@
-            <div class="header text-center">
-                <h3><strong>Crear Reserva </strong></h3>
-            </div>
+        <div class="habitacion-detalle-container">
+            <div class="habitacion-info">
 
-            @*Body*@
-            <div class="card-body">
+                @* Imagen *@
+                <div class="habitacion-image-inside">
+                    @if (!string.IsNullOrEmpty(Habitaciones?.ImagenUrl))
+                    {
+                        <img src="@Habitaciones.ImagenUrl" alt="Imagen de la habitación" class="img-fluid rounded shadow-sm" />
+                    }
 
-                @* Información de la habitación seleccionada *@
-                <div>
-                    <strong>Tipo de habitaci&oacute;n: </strong>@TipoHabitaciones.Categoria
-                    <br />
-                    <strong>Habitación: </strong> @Habitaciones.NumeroHabitacion
-                    <br />
-                    <strong>Fecha de Inicio: </strong> @Reservas.FechaInicio?.ToString("yyyy-MM-dd")
-                    <br />
-                    <strong>Fecha Final: </strong> @Reservas.FechaFinal?.ToString("yyyy-MM-dd")
-                    <br />
-                    <strong>Noches Transcurridas: </strong> @CantidadNoches
-                    <br />
-                    <strong>Capacidad de personas: </strong> @Habitaciones.Capacidad
-                    <br />
-                    <strong>Precio base: </strong> @Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
                 </div>
-
-                @*Detalle*@
-                <div class="border border-success p-3 mt-3">
-                    <h5>Detalle de Reserva</h5>
-                    <div class="input-group align-items-center mt-2">
-
-                        <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.ExtrasId>
-                            <option value="0" selected disabled>Seleccione un articulo extra</option>
-                            @foreach (var extra in ListaArticulosExtras)
-                            {
-                                <option value="@extra.ExtrasId">@extra.Descripcion (@extra.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US")))</option>
-                            }
-                        </InputSelect>
-
-                        <label class="col-form-label input-group-text">Cantidad:</label>
-                        <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
-
-                        <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle>Agregar</button>
-                    </div>
-
-                    <table class="table table-bordered mt-3">
-                        <thead>
+                <div class="habitacion-card">
+                    <strong>Tipo de habitación: </strong>@TipoHabitaciones.Categoria
+                    <br />
+                    <strong>Habitación: </strong>@Habitaciones.NumeroHabitacion
+                    <br />
+                    <strong>Fecha de Inicio: </strong>@Reservas.FechaInicio?.ToString("yyyy-MM-dd")
+                    <br />
+                    <strong>Fecha Final: </strong>@Reservas.FechaFinal?.ToString("yyyy-MM-dd")
+                    <br />
+                    <strong>Noches Transcurridas: </strong>@CantidadNoches
+                    <br />
+                    <strong>Capacidad de personas: </strong>@Habitaciones.Capacidad
+                    <br />
+                    <strong>Precio base: </strong>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
+                </div>
+            </div>
+            @* Detalle *@
+            <div class="habitacion-detalle">
+                <h5><strong>Extras</strong></h5>
+                <div class="input-group align-items-center mt-2">
+                    <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.ExtrasId>
+                        <option value="0" selected disabled>Seleccione un artículo extra</option>
+                        @foreach (var extra in ListaArticulosExtras)
+                        {
+                            <option value="@extra.ExtrasId">@extra.Descripcion (@extra.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US")))</option>
+                        }
+                    </InputSelect>
+                    <label class="col-form-label input-group-text">Cantidad:</label>
+                    <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
+                    <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle>Agregar</button>
+                </div>
+                @* Tabla *@
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Extra</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalle in Reservas.ReservasDetalles)
+                        {
+                            var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
                             <tr>
-                                <th>Extra</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
+                                <td>@articuloExtra?.Descripcion</td>
+                                <td>@detalle.Cantidad</td>
+                                <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                <td>
+                                    <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var detalle in Reservas.ReservasDetalles)
-                            {
-                                var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
-
-                                <tr>
-                                    <td>@articuloExtra?.Descripcion</td>
-                                    <td>@detalle.Cantidad</td>
-                                    <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
-                                    <td>
-                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                @*MontoTotal*@
-                <div>
-                    <label class="form-label">Monto Total</label>
-                    <InputNumber class="form-control" @bind-Value="Reservas.Total" ReadOnly="true"></InputNumber>
-                    <ValidationMessage For="(()=> Reservas.Total)" />
-                </div>
-
-                <div class="container-info">
-                    <div class="container-cliente">
-                        @*Informacion del cliente*@
-                        <h4>Informaci&oacute;n del huesped</h4>
-                        @*Nombre*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Nombre y apellido</strong></label>
-                            <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
-                            <ValidationMessage For="(()=> Cliente.Nombres)" />
-                        </div>
-
-                        @*Telefono*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Tel&eacute;fono</strong></label>
-                            <InputText class="form-control" placeholder=" Ej: 809-1231456" @bind-Value="Cliente.Telefono"></InputText>
-                            <ValidationMessage For="(()=> Cliente.Telefono)" />
-                        </div>
-
-                        @*Email*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Email</strong></label>
-                            <InputText class="form-control" @bind-Value="Cliente.Email"></InputText>
-                            <ValidationMessage For="(()=> Cliente.Email)" />
-                        </div>
-
-                        @*Cedula*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>C&eacute;dula</strong></label>
-                            <InputText class="form-control" @bind-Value="Cliente.Cedula"></InputText>
-                            <ValidationMessage For="(()=> Cliente.Cedula)" />
-                        </div>
-
-                    </div>
-                    <div class="container-metodopago">
-
-                        @* Metodo de pago *@
-                        <h4>M&eacute;todo de pago</h4>
-                        @*Nombre*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Nombre y apellido</strong></label>
-                            <InputText class="form-control" @bind-Value="MetodoPago.NombresApellido"></InputText>
-                            <ValidationMessage For="(()=> MetodoPago.NombresApellido)" />
-                        </div>
-
-                        @*Numero de tarjeta*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Numero de tarjeta</strong></label>
-                            <InputText class="form-control" @bind-Value="MetodoPago.NumeroTarjeta"></InputText>
-                            <ValidationMessage For="(()=> MetodoPago.NumeroTarjeta)" />
-                        </div>
-
-                        @*Fecha de expiracion*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>Fecha de expiracion</strong></label>
-                            <InputText class="form-control" placeholder= " Ej: 04/2024" @bind-Value="MetodoPago.FechaExpiracion"></InputText>
-                            <ValidationMessage For="(()=> MetodoPago.FechaExpiracion)" />
-                        </div>
-
-                        @*CVC*@
-                        <div class="col-2 mt-2">
-                            <label class="form-label"><strong>CVC</strong></label>
-                            <InputText class="form-control" @bind-Value="MetodoPago.CodigoSeguridad"></InputText>
-                            <ValidationMessage For="(()=> MetodoPago.CodigoSeguridad)" />
-                        </div>
-                    </div>
-                </div>
+                        }
+                    </tbody>
+                </table>
             </div>
-
-            @*Modal*@
-            <Modal @ref="modal" title="Modal title" IsVerticallyCentered="true">
-                <BodyTemplate>
-                    <Icon Name="IconName.CreditCard"></Icon>
-                    Pago realizado con exito.
-                </BodyTemplate>
-                <FooterTemplate>
-                    <Button Color="ButtonColor.Primary">Guardar</Button>
-                </FooterTemplate>
-            </Modal>
-
-            @*Footer*@
-            <div class="footer">
-                <button type="button" class="btn btn-primary" @onclick="() => Volver()">Volver</button>
-                <button type="submit" class="btn btn-success">Guardar</button>
+            @*MontoTotal*@
+            <div>
+                <label class="form-label">Monto Total</label>
+                <InputNumber class="form-control" @bind-Value="Reservas.Total" ReadOnly="true"></InputNumber>
+                <ValidationMessage For="(()=> Reservas.Total)" />
             </div>
         </div>
+
+        <div class="info-metodo-container">
+            @*Información del huésped*@
+            <div class="container-info">
+                <h4>Información del huésped</h4>
+                @* Nombre *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Nombre y apellido</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
+                    <ValidationMessage For="(() => Cliente.Nombres)" />
+                </div>
+                @* Telefono *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Teléfono</strong></label>
+                    <InputText class="form-control" placeholder="Ej: 809-1231456" @bind-Value="Cliente.Telefono"></InputText>
+                    <ValidationMessage For="(() => Cliente.Telefono)" />
+                </div>
+                @* Email *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Email</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Email"></InputText>
+                    <ValidationMessage For="(() => Cliente.Email)" />
+                </div>
+                @* Cedula *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Cédula</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Cedula"></InputText>
+                    <ValidationMessage For="(() => Cliente.Cedula)" />
+                </div>
+            </div>
+
+            @*Método de pago*@
+            <div class="container-metodopago">
+                <h4>Método de pago</h4>
+                @* Nombre *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Nombre y apellido</strong></label>
+                    <InputText class="form-control" @bind-Value="MetodoPago.NombresApellido"></InputText>
+                    <ValidationMessage For="(() => MetodoPago.NombresApellido)" />
+                </div>
+                @* NumeroTarjeta *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Número de tarjeta</strong></label>
+                    <InputText class="form-control" @bind-Value="MetodoPago.NumeroTarjeta"></InputText>
+                    <ValidationMessage For="(() => MetodoPago.NumeroTarjeta)" />
+                </div>
+                @* FechaExpiracion *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Fecha de expiración</strong></label>
+                    <InputText class="form-control" placeholder="Ej: 04/2024" @bind-Value="MetodoPago.FechaExpiracion"></InputText>
+                    <ValidationMessage For="(() => MetodoPago.FechaExpiracion)" />
+                </div>
+                @* CVV *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>CVC</strong></label>
+                    <InputText class="form-control" @bind-Value="MetodoPago.CodigoSeguridad"></InputText>
+                    <ValidationMessage For="(() => MetodoPago.CodigoSeguridad)" />
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Confirmar pago</button>
+            </div>
+        </div>
+
+        @* Modal *@
+        <Modal @ref="modal" title="Modal title" IsVerticallyCentered="true">
+            <BodyTemplate>
+                <Icon Name="IconName.CreditCard"></Icon>
+                Pago realizado con éxito.
+            </BodyTemplate>
+            <FooterTemplate>
+                <Button Color="ButtonColor.Primary">Guardar</Button>
+            </FooterTemplate>
+        </Modal>
+
+        @* Footer *@
+        <div class="card-footer mt-5">
+            <div class="text-center">
+                <h4>© Hotel Sunset | Todos los derechos reservados. </h4>
+            </div>
+        </div>
+
     </div>
+
+
 </EditForm>
 
 @code {
@@ -304,7 +302,6 @@
 
         DetalleSeleccionado = new ReservasDetalle();
     }
-
     public void Volver()
     {
         navigationManager.NavigateTo("/Reservas");
