@@ -37,7 +37,7 @@
 
     .habitacion-detalle p {
         margin: 0;
-        color: #555;
+        color: #000;
     }
 
     .habitacion-detalle button {
@@ -54,7 +54,9 @@
         .habitacion-detalle button:hover {
             background-color: #555;
         }
-
+/*.button-container button{
+    background: none;
+}*/
 .footer {
     text-align: center;
     margin-top: 20px;
