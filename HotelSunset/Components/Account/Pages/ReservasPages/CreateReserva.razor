@@ -130,29 +130,42 @@
             @*Método de pago*@
             <div class="container-metodopago">
                 <h4>Método de pago</h4>
+
+                @*InputSelectMetodoPago*@
+                <div class="col mt-2">
+                    <label class="form-label"><strong>M&eacute;todo de pago</strong></label>
+                    <InputSelect class="form-select" @bind-Value="MetodoPago.MetodoPagoId">
+                        <option value="0" selected disabled>Seleccione un m&eacute;todo de pago</option>
+                        @foreach (var pago in ListaMetodoPago)
+                        {
+                            <option value="@pago.MetodoPagoId">@pago.Descripcion</option>
+                        }
+                    </InputSelect>
+                </div>
+
                 @* Nombre *@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>Nombre y apellido</strong></label>
-                    <InputText class="form-control" @bind-Value="MetodoPago.NombresApellido"></InputText>
-                    <ValidationMessage For="(() => MetodoPago.NombresApellido)" />
+                    <InputText class="form-control" @bind-Value="Tarjetas.NombresApellido"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.NombresApellido)" />
                 </div>
                 @* NumeroTarjeta *@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>Número de tarjeta</strong></label>
-                    <InputText class="form-control" @bind-Value="MetodoPago.NumeroTarjeta"></InputText>
-                    <ValidationMessage For="(() => MetodoPago.NumeroTarjeta)" />
+                    <InputText class="form-control" @bind-Value="Tarjetas.NumeroTarjeta"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.NumeroTarjeta)" />
                 </div>
                 @* FechaExpiracion *@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>Fecha de expiración</strong></label>
-                    <InputText class="form-control" placeholder="Ej: 04/2024" @bind-Value="MetodoPago.FechaExpiracion"></InputText>
-                    <ValidationMessage For="(() => MetodoPago.FechaExpiracion)" />
+                    <InputText class="form-control" placeholder="Ej: 04/2024" @bind-Value="Tarjetas.FechaExpiracion"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.FechaExpiracion)" />
                 </div>
                 @* CVV *@
                 <div class="col-2 mt-2">
                     <label class="form-label"><strong>CVC</strong></label>
-                    <InputText class="form-control" @bind-Value="MetodoPago.CodigoSeguridad"></InputText>
-                    <ValidationMessage For="(() => MetodoPago.CodigoSeguridad)" />
+                    <InputText class="form-control" @bind-Value="Tarjetas.CodigoSeguridad"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.CodigoSeguridad)" />
                 </div>
                 <button type="submit" class="btn btn-outline-primary">Confirmar pago</button>
             </div>
@@ -175,10 +188,7 @@
                 <h4>© Hotel Sunset | Todos los derechos reservados. </h4>
             </div>
         </div>
-
     </div>
-
-
 </EditForm>
 
 @code {
@@ -198,9 +208,12 @@
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
     public List<Reservas> ListaReservas { get; set; } = new List<Reservas>();
 
+    public List<MetodoPago> ListaMetodoPago { get; set; } = new List<MetodoPago>();
+    public MetodoPago MetodoPago { get; set; } = new MetodoPago();
+
     public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
 
-    public MetodoPago MetodoPago { get; set; } = new MetodoPago();
+    public Tarjetas Tarjetas { get; set; } = new Tarjetas();
 
     public Clientes Cliente { get; set; } = new Clientes();
 
@@ -227,6 +240,7 @@
 
         ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
         TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
+        ListaMetodoPago = await metodoPagoService.Listar(m => true);
 
         CantidadNoches = (Reservas.FechaFinal - Reservas.FechaInicio)?.Days ?? 0;
         Habitaciones.MontoTotal *= CantidadNoches;
@@ -237,11 +251,11 @@
     public async Task Guardar()
     {
         Cliente.Reservas = Reservas;
+        Cliente.Tarjeta = Tarjetas;
         var cliente = await clientesService.Guardar(Cliente);
         var reserva = await reservasServices.Guardar(Reservas);
-        var metodoPago = await metodoPagoService.Guardar(MetodoPago);
 
-        if (reserva && metodoPago && cliente)
+        if (reserva && cliente)
         {
             await modal.ShowAsync();
             Notificacion(ToastType.Success, "Reserva", "Se ha creado correctamente ");
@@ -255,7 +269,6 @@
         }
 
     }
-
 
     public void AgregarDetalle()
     {
@@ -300,9 +313,7 @@
         foreach (var detalle in Reservas.ReservasDetalles)
         {
             Reservas.Total += detalle.Precio;
-        }
-
-        // DetalleSeleccionado = new ReservasDetalle();
+        }        
     }
 
     public void Volver()
