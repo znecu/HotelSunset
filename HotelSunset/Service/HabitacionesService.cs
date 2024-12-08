@@ -93,6 +93,7 @@ public class HabitacionesService(IDbContextFactory<ApplicationDbContext> DbFacto
         return await _contexto.Habitaciones
             .Include(h => h.TipoHabitaciones)
             .Include(h => h.Reservas)
+            .Include(d => d.HabitacionDetalles)
             .AsNoTracking()
             .Where(criterio)
             .ToListAsync();
