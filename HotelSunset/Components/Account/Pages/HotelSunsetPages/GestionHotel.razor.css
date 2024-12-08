@@ -126,8 +126,8 @@ ul {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    gap: 15px; 
-    background-color: #e8e8e8
+    gap: 15px;
+    background-color: #f6f6f6
 }
 
     .habitacion-card:hover {
