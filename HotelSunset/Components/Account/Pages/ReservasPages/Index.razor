@@ -2,6 +2,8 @@
 @using System.Globalization
 @rendermode InteractiveServer
 @inject HabitacionesService habitacionesService
+@inject HabitacionesDetalleService habitacionesDetallesService
+@inject AgregadosServices agregadosService
 @inject ReservasService reservasService
 @inject NavigationManager navigationManager
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
@@ -51,15 +53,31 @@
                             @if (!string.IsNullOrEmpty(habitacion.ImagenUrl))
                             {
                                 <img src="@habitacion.ImagenUrl" alt="Imagen de la habitación" />
-                            }                            
+                            }
                         </div>
-                        
                         @*Detalles de la habitación *@
                         <div class="habitacion-detalle">
                             <h4>@habitacion.TipoHabitaciones?.Categoria</h4>
                             <p>@habitacion.TipoHabitaciones?.Descripcion</p>
                             <p><strong>Capacidad:</strong> @habitacion.Capacidad</p>
-                            <p><strong>Agregados:</strong> </p>
+
+                            @* Mostrar agregados *@
+                            <strong>Agregados:</strong>
+                            @if (habitacion.HabitacionDetalles != null && habitacion.HabitacionDetalles.Any())
+                            {
+                                @foreach (var detalle in habitacion.HabitacionDetalles)
+                                {
+                                    var agregado = ListaAgregados.FirstOrDefault(a => a.AgregadoId == detalle.AgregadoId);
+                                    if (agregado != null)
+                                    {
+                                        <span>@agregado.Descripcion</span>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <span>No hay agregados disponibles para esta habitación.</span>
+                            }
                             <p><strong>Precio:</strong> @habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
                             <button type="button" class="btn btn-outline-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)"> Reservar</button>
                         </div>
@@ -77,6 +95,9 @@
 
 @code {
     public Reservas reservas { get; set; } = new Reservas();
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public HabitacionDetalle HabitacionDetalle { get; set; } = new HabitacionDetalle();
+    public List<HabitacionDetalle> ListaDetalle { get; set; } = new List<HabitacionDetalle>();
     public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
     public List<ToastMessage> Mensaje { get; set; } = [];
     public List<Agregados> ListaAgregados { get; set; } = new List<Agregados>();
@@ -85,6 +106,7 @@
     protected override async Task OnInitializedAsync()
     {
         ListaHabitaciones = await habitacionesService.ListarConDetalles();
+        ListaAgregados = await agregadosService.Listar(a => true);
     }
 
     private ToastMessage ShowToast(ToastType toastType, string title, string message)
