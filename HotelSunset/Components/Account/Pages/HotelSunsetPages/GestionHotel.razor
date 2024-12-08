@@ -8,6 +8,50 @@
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Gestión del Hotel</PageTitle>
+<div class="card-body">
+    <div class="row mb-4 align-items-end">
+        @* Filtro por fechas *@
+        <div class="col-md-3">
+            <label for="fechaInicio">Fecha de Inicio</label>
+            <InputDate class="form-control" @bind-Value="Desde" />
+        </div>
+
+        <div class="col-md-3">
+            <label for="fechaFinal">Fecha Final</label>
+            <InputDate class="form-control" @bind-Value="Hasta"
+                       min="@Desde?.AddDays(1).ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3 text-start">
+            <button class="btn btn-outline-primary" @onclick="FiltrarPorFecha">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+        <div class="col-md-3 text-start">
+            <button class="btn btn-outline-secondary ms-2" @onclick="Restablecer">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        @*Filtro*@
+        <div class="col-3">
+            <InputSelect class="form-select" @bind-Value="Filtro">
+                <option value="">Elija una opci&omicron;n</option>
+                <option value="Nombres">Nombres</option>
+                <option value="Email">Email</option>
+                <option value="Cedula">Cedula</option>
+            </InputSelect>
+        </div>
+        @*Buscar*@
+        <div class="col-3">
+            <div class="input-group">
+                <input class="form-control" @bind-value="ValorFiltro" placeholder="Buscar" />
+                <button type="button" class="btn btn-outline-primary bi bi-search" @onclick=Buscar></button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="habitaciones-container">
     @if (ListaReservas.Count == 0)
     {
@@ -20,7 +64,7 @@
             <div class="habitacion-card">
                 @* Imagen de la habitación *@
                 <div class="habitacion-image">
-                    @if (!string.IsNullOrEmpty(reserva.Habitacion.ImagenUrl))
+                    @if (!string.IsNullOrEmpty(reserva.Habitacion?.ImagenUrl))
                     {
                         <img src="@reserva.Habitacion.ImagenUrl" alt="Imagen de la habitación" />
                     }
@@ -32,7 +76,7 @@
                         <p><strong>Reserva ID: </strong>@reserva.ReservaId</p>
                         <p><strong>Fecha de Inicio: </strong>@reserva.FechaInicio</p>
                         <p><strong>Fecha Final: </strong>@reserva.FechaFinal</p>
-                        <p><strong>Capacidad de personas: </strong>@reserva.Habitacion.Capacidad</p>
+                        <p><strong>Capacidad de personas: </strong>@reserva.Habitacion?.Capacidad</p>
 
                         <strong>Artículos extras:</strong>
                         <ul>
@@ -57,7 +101,7 @@
                             }
                         </ul>
 
-                        <p><strong>Monto total: </strong>@reserva.Habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+                        <p><strong>Monto total: </strong>@reserva.Habitacion?.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
                     </div>
 
                     @* Información del huésped *@
@@ -85,6 +129,12 @@
     public List<Agregados> ListaAgregados { get; set; } = new List<Agregados>();
     public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    public DateTime? Desde { get; set; }
+    public DateTime? Hasta { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         ListaReservas = await reservasService.Listar(r => true);
@@ -102,5 +152,50 @@
             };
         toastService.Notify(mensaje);
         return mensaje;
+    }
+
+    private async Task FiltrarPorFecha()
+    {
+        if (Desde.HasValue && Hasta.HasValue)
+        {
+            if (Hasta.Value < Desde.Value)
+            {
+                Notificacion(ToastType.Warning, "Hotel Sunset", "La fecha final no puede ser antes que la fecha de inicio.");
+                return;
+            }
+
+            ListaReservas = await reservasService.Listar(r =>
+                (r.FechaInicio <= Hasta.Value && r.FechaFinal >= Desde.Value));
+        }
+        else
+        {
+            Notificacion(ToastType.Warning, "Hotel Sunset", "Por favor, selecciona ambas fechas.");
+        }
+    }
+
+    public async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "Nombres")
+                ListaReservas = await reservasService.Listar(c => c.Clientes.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "Email")
+                ListaReservas = await reservasService.Listar(c => c.Clientes.Email.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "Cedula")
+                ListaReservas = await reservasService.Listar(c => c.Clientes.Cedula.ToLower().Contains(ValorFiltro.ToLower()));
+        }
+        else
+        {
+            ListaReservas = await reservasService.Listar(c => true);
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        ListaReservas = await reservasService.Listar(r => true);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+        Desde = null;
+        Hasta = null;
     }
 } 
