@@ -122,6 +122,9 @@ namespace HotelSunset.Service
             await using var _contexto = await DbFactory.CreateDbContextAsync();
 
             return await _contexto.Reservas
+                .Include(c => c.Clientes)
+                .Include(h => h.Habitacion)
+                .Include(r => r.ReservasDetalles)
                 .AsNoTracking()
                 .Where(criterio)
                 .ToListAsync();
