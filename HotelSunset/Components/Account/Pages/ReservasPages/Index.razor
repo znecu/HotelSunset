@@ -17,7 +17,7 @@
         <h2 class="text-center mb-4">Seleccionar alojamiento</h2>
 
         @* Filtro por fechas *@
-        <div class="row mb-4">
+        <div class="row mb-4 align-items-end">
             <div class="col-md-3">
                 <label>Fecha de Inicio</label>
                 <InputDate @bind-Value="reservas.FechaInicio" class="form-control"
@@ -28,11 +28,21 @@
                 <InputDate @bind-Value="reservas.FechaFinal" class="form-control"
                            min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
             </div>
-            <div class="col-md-3 align-self-end">
-                <button class="btn btn-outline-primary" @onclick="FiltrarHabitaciones"><Icon Name="IconName.Search"></Icon></button>
+            
+            <div class="col-md-3 text-start">
+                <button class="btn btn-outline-primary" @onclick="FiltrarHabitaciones">
+                    <Icon Name="IconName.Search"></Icon>
+                </button>
+                <button class="btn btn-outline-secondary ms-2" @onclick="Restablecer">
+                    <Icon Name="IconName.ArrowClockwise"></Icon>
+                </button>
             </div>
-            <div class="col-md-3 align-self-end">
-                <button class="btn btn-outline-secondary" @onclick="Restablecer"><Icon Name="IconName.ArrowClockwise"></Icon></button>
+            <div class="col-md-3 text-start">
+                <a href="/Reservas/VerReserva">
+                    <button type="button" class="btn btn-outline-secondary">
+                        <Icon Name="IconName.CardList"></Icon> Mi reserva
+                    </button>
+                </a>
             </div>
         </div>
 
