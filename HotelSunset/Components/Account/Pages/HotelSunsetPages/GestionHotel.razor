@@ -26,45 +26,48 @@
                     }
                 </div>
 
-                @* Detalles de la reserva *@
-                <div class="Reserva">
-                    <p><strong>Reserva ID: </strong>@reserva.ReservaId</p>
-                    <p><strong>Fecha de Inicio: </strong>@reserva.FechaInicio</p>
-                    <p><strong>Fecha Final: </strong>@reserva.FechaFinal</p>
-                    <p><strong>Capacidad de personas: </strong>@reserva.Habitacion.Capacidad</p>
+                @* Contenedor de los detalles *@
+                <div class="reserva-info">
+                    <div class="detalles-principales">
+                        <p><strong>Reserva ID: </strong>@reserva.ReservaId</p>
+                        <p><strong>Fecha de Inicio: </strong>@reserva.FechaInicio</p>
+                        <p><strong>Fecha Final: </strong>@reserva.FechaFinal</p>
+                        <p><strong>Capacidad de personas: </strong>@reserva.Habitacion.Capacidad</p>
 
-                    @* Mostrar artículos extras *@
-                    <strong>Artículos extras:</strong>
-                    <ul>
-                        @if (reserva.ReservasDetalles != null && reserva.ReservasDetalles.Any())
-                        {
-                            @foreach (var detalle in reserva.ReservasDetalles)
+                        <strong>Artículos extras:</strong>
+                        <ul>
+                            @if (reserva.ReservasDetalles != null && reserva.ReservasDetalles.Any())
                             {
-                                var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
-                                if (articuloExtra != null)
+                                foreach (var detalle in reserva.ReservasDetalles)
                                 {
-                                    <li>@articuloExtra.Descripcion</li>
-                                }
-                                else
-                                {
-                                    <li>Artículo extra no encontrado</li>
+                                    var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
+                                    if (articuloExtra != null)
+                                    {
+                                        <li>@articuloExtra.Descripcion</li>
+                                    }
+                                    else
+                                    {
+                                        <li>Artículo extra no encontrado</li>
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            <li>No hay artículos extras asociados a esta reserva.</li>
-                        }
-                    </ul>
+                            else
+                            {
+                                <li>No hay artículos extras asociados a esta reserva.</li>
+                            }
+                        </ul>
 
-                    <p><strong>Monto total: </strong>@reserva.Habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+                        <p><strong>Monto total: </strong>@reserva.Habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+                    </div>
 
                     @* Información del huésped *@
-                    <h5>Información del huésped</h5>
-                    <p><strong>Nombre y Apellido: </strong>@reserva.Clientes?.Nombres</p>
-                    <p><strong>Teléfono: </strong>@reserva.Clientes?.Telefono</p>
-                    <p><strong>Email: </strong>@reserva.Clientes?.Email</p>
-                    <p><strong>Cédula: </strong>@reserva.Clientes?.Cedula</p>
+                    <div class="informacion-huesped">
+                        <h5>Información del huésped</h5>
+                        <p><strong>Nombre y Apellido: </strong>@reserva.Clientes?.Nombres</p>
+                        <p><strong>Teléfono: </strong>@reserva.Clientes?.Telefono</p>
+                        <p><strong>Email: </strong>@reserva.Clientes?.Email</p>
+                        <p><strong>Cédula: </strong>@reserva.Clientes?.Cedula</p>
+                    </div>
                 </div>
             </div>
         }
