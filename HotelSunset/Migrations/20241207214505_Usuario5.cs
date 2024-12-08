@@ -241,7 +241,8 @@ namespace HotelSunset.Migrations
                     Estado = table.Column<bool>(type: "bit", nullable: false),
                     PrecioBase = table.Column<double>(type: "float", nullable: false),
                     Capacidad = table.Column<int>(type: "int", nullable: false),
-                    MontoTotal = table.Column<double>(type: "float", nullable: false)
+                    MontoTotal = table.Column<double>(type: "float", nullable: false),
+                    ImagenUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

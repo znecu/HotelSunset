@@ -11,7 +11,7 @@
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Editar</PageTitle>
-<EditForm Model="Habitaciones" OnValidSubmit="Editar">
+<EditForm Model="Habitaciones" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
 
     <div class="container">
@@ -87,12 +87,13 @@
                         <tbody>
                             @foreach (var detalle in Habitaciones.HabitacionDetalles)
                             {
+                                var agregados = ListaAgregados.FirstOrDefault(a => a.AgregadoId == detalle.AgregadoId);
                                 <tr>
-                                    <td>@detalle.AgregadoId</td>
+                                    <td>@agregados.Descripcion</td>
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
-                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash">Remover</button>
+                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash" type="button">Remover</button>
                                     </td>
                                 </tr>
                             }
@@ -103,7 +104,6 @@
                 <div>
                     <label class="form-label">Monto Total</label>
                     <InputNumber class="form-control" @bind-Value="Habitaciones.MontoTotal" ReadOnly="true"></InputNumber>
-                    <ValidationMessage For="(()=> Habitaciones.MontoTotal)" />
                 </div>
             </div>
 
@@ -151,7 +151,7 @@
         return mensaje;
     }
 
-    public async Task Editar()
+    public async Task Guardar()
     {
 
         var crear = await habitacionesService.Guardar(Habitaciones);
@@ -201,7 +201,8 @@
     public void RemoverDetalle(HabitacionDetalle eliminarDetalle)
     {
         Habitaciones.HabitacionDetalles.Remove(eliminarDetalle);
-
+        DetalleSeleccionado.AgregadoId = eliminarDetalle.AgregadoId;
+        DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;
         Habitaciones.MontoTotal = Habitaciones.PrecioBase;
 
         foreach (var detalle in Habitaciones.HabitacionDetalles)

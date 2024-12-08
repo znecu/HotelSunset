@@ -69,7 +69,7 @@
                 <div class="border border-success p-3 mt-3">
                     <h5>Detalle de Agregados</h5>
                     <div class="input-group align-items-center mt-2">
-                        <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.AgregadoId>
+                        <InputSelect class="form-select" @bind-Value="DetalleSeleccionado.AgregadoId">
                             <option value="0" selected disabled>Seleccione un agregado</option>
                             @foreach (var agregado in ListaAgregados)
                             {
@@ -100,7 +100,7 @@
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
                                     <td>
-                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-outline-danger bi bi-trash"> Remover</button>
+                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-outline-danger bi bi-trash" type="button"> Remover</button>
                                     </td>
                                 </tr>
                             }
@@ -110,14 +110,14 @@
                 @*MontoTotal*@
                 <div>
                     <label class="form-label"><strong>Monto Total</strong></label>
-                    <label class="form-control" readonly>@Habitaciones.MontoTotal.ToString("N2")</label>
+                    <label class="form-control" readonly>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</label>
                 </div>
             </div>
 
             @*Footer*@
             <div class="footer">
-                <button type="button" class="btn btn-outline-primary" @onclick="() => Volver()"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
-                <button type="submit" class="btn btn-outline-success"><Icon Name="IconName.Floppy"></Icon> Guardar</button>
+                <label class="form-label">Monto Total</label>
+                <InputNumber class="form-control" @bind-Value="Habitaciones.MontoTotal" ReadOnly="true"></InputNumber>
             </div>
         </div>
     </div>
@@ -195,26 +195,21 @@
                     Cantidad = DetalleSeleccionado.Cantidad
                 });
 
-            ActualizarMontoTotal();
+            Habitaciones.MontoTotal = Habitaciones.PrecioBase;
+            foreach (var detalle in Habitaciones.HabitacionDetalles)
+            {
+                Habitaciones.MontoTotal += detalle.Precio;
+            }
+
             DetalleSeleccionado = new HabitacionDetalle();
         }
     }
 
-    public void ActualizarMontoTotal()
-    {
-        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
-
-        foreach (var detalle in Habitaciones.HabitacionDetalles)
-        {
-            Habitaciones.MontoTotal += detalle.Precio;
-        }
-    }
-    
-
     public void RemoverDetalle(HabitacionDetalle eliminarDetalle)
     {
         Habitaciones.HabitacionDetalles.Remove(eliminarDetalle);
-
+        DetalleSeleccionado.AgregadoId = eliminarDetalle.AgregadoId;
+        DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;
         Habitaciones.MontoTotal = Habitaciones.PrecioBase;
 
         foreach (var detalle in Habitaciones.HabitacionDetalles)
@@ -222,7 +217,7 @@
             Habitaciones.MontoTotal += detalle.Precio;
         }
 
-        DetalleSeleccionado = new HabitacionDetalle();
+        // DetalleSeleccionado = new HabitacionDetalle();
     }
 
     public void Volver()
