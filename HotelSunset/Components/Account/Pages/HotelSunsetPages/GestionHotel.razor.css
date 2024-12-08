@@ -1,66 +1,82 @@
-﻿/* Contenedor principal de la reserva */
+﻿
+.habitaciones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 700px; 
+    overflow-y: auto; 
+    padding-right: 10px; 
+    width: 80%;
+    margin-left: 160px;
+    margin-top: 200px;
+
+}
+
 .reserva-info {
     display: flex;
-    flex-direction: row; /* Alinea la habitación y el huésped en fila */
-    gap: 15px; /* Reduce el espaciado entre las secciones */
+    flex-direction: row; 
+    gap: 15px; 
     justify-content: space-between;
-    max-width: 1200px; /* Limita el ancho máximo del contenedor */
-    margin: 0 auto; /* Centra el contenedor */
+    max-width: 1200px; 
+    margin: 0 auto; 
+    margin-right: 290px;
+
 }
 
-/* Estilo para la sección de la habitación */
 .detalles-principales {
-    flex: 2; /* Mayor espacio para los detalles de la habitación */
-    padding-right: 15px; /* Espaciado a la derecha */
-    border-right: 2px solid #ddd; /* Línea de separación con borde */
-    padding: 15px; /* Relleno interno más pequeño */
+    flex: 2; 
+    padding-right: 15px; 
+    border-right: 2px solid #ddd; 
+    padding: 15px; 
+
 }
 
-/* Información del huésped */
+
 .informacion-huesped {
-    flex: 1; /* Menos espacio */
-    text-align: left; /* Alineación del contenido */
-    padding: 15px; /* Relleno interno más pequeño */
+    flex: 1;
+    text-align: left; 
+    padding: 15px; 
+
 }
 
-    /* Detalles principales de la reserva */
     .Reserva p,
     .informacion-huesped p {
-        color: #555; /* Color uniforme */
-        margin: 2px 0; /* Espaciado reducido */
+        color: #555; 
+        margin: 2px 0; 
     }
 
-    /* Ajuste de la separación en los títulos (strong) */
     .Reserva strong,
     .informacion-huesped strong {
-        color: #333; /* Color de los títulos */
-        margin-bottom: 4px; /* Separación más pequeña debajo de los títulos */
+        color: #333; 
+        margin-bottom: 4px; 
     }
 
-/* Estilo para los artículos extras (en fila) */
+
 .detalles-principales ul {
     padding-left: 0;
     margin: 10px 0;
     list-style-type: none;
-    display: flex; /* Mantiene los artículos extras en fila */
-    gap: 10px; /* Espaciado entre los artículos */
-    flex-wrap: wrap; /* Permite que los artículos extras se ajusten a la siguiente línea si es necesario */
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
 }
 
 .detalles-principales li {
-    color: #555; /* Color del texto */
-    margin: 0; /* Elimina márgenes adicionales */
-    background: none; /* Elimina el fondo */
-    padding: 0; /* Elimina el relleno */
-    border: none; /* Elimina los bordes */
-    font-weight: normal; /* Asegura que el texto no sea negrita */
+    color: #555;
+    margin: 0;
+    background: none;
+    padding: 0; 
+    border: none;
+    font-weight: normal;
 }
 
-/* Imagen de la habitación */
 .habitacion-image {
-    width: 350px; /* Aumento el ancho de la imagen */
+    width: 350px; 
     height: auto;
     border-radius: 10px;
+    margin-top: 20px;
+    margin-left: 10px;
+
 }
 
     .habitacion-image img {
@@ -69,34 +85,25 @@
         border-radius: 10px;
     }
 
-/* Estilo para el botón */
-.habitacion-card .btn {
-    padding: 8px 15px;
-    background-color: #b6a579;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+
+.informacion-huesped{
+    margin-left: 0px;
+
 }
 
-    .habitacion-card .btn:hover {
-        background-color: #555;
+    .informacion-huesped h5 {
+        margin-bottom: 20px;
+        color: #000;
+        margin-left: 0; 
+        white-space: nowrap;
     }
 
-/* Estilo de las secciones con margen */
-.informacion-huesped h5 {
-    margin-bottom: 10px; /* Reducir margen debajo del título */
-    color: #333;
-    margin-left: 0; /* Alinea el título con el resto del contenido */
-}
+    .informacion-huesped p {
+        margin: 15px 0; 
+        color: #555;
+        white-space: nowrap;
+    }
 
-.informacion-huesped p {
-    margin: 5px 0; /* Espaciado entre cada párrafo */
-    color: #555;
-}
-
-/* Ajustes generales para las listas */
 ul {
     list-style-type: none;
     padding-left: 0;
@@ -106,30 +113,30 @@ ul {
         margin: 5px 0;
     }
 
-/* Contenedor de habitaciones */
 .habitaciones-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
 }
 
-/* Tarjeta de habitación */
 .habitacion-card {
     display: flex;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    gap: 15px; /* Espacio entre la imagen y los detalles */
+    gap: 15px; 
+    background-color: #e8e8e8
 }
 
     .habitacion-card:hover {
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     }
 
-/* Contenedor para los detalles de la habitación */
+
 .Reserva {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Espaciado reducido entre los elementos */
+    gap: 5px; 
 }
