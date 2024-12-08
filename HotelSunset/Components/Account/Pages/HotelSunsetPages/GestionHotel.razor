@@ -1,9 +1,104 @@
 ﻿@page "/GestionHotel"
 @layout AdminLayout
+@rendermode InteractiveServer
+@inject ReservasService reservasService
+@inject ArticulosExtrasSerive articulosExtrasService
+@inject NavigationManager navigationManager
+@inject ToastService toastService
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
-<h1>Gestión del Hotel</h1>
+<PageTitle>Gestión del Hotel</PageTitle>
+<div class="habitaciones-container">
+    @if (ListaReservas.Count == 0)
+    {
+        <div class="text-center">No hay reservas registradas.</div>
+    }
+    else
+    {
+        @foreach (var reserva in ListaReservas)
+        {
+            <div class="habitacion-card">
+                @* Imagen de la habitación *@
+                <div class="habitacion-image">
+                    @if (!string.IsNullOrEmpty(reserva.Habitacion.ImagenUrl))
+                    {
+                        <img src="@reserva.Habitacion.ImagenUrl" alt="Imagen de la habitación" />
+                    }
+                </div>
+
+                @* Detalles de la reserva *@
+                <div class="Reserva">
+                    <p><strong>Reserva ID: </strong>@reserva.ReservaId</p>
+                    <p><strong>Fecha de Inicio: </strong>@reserva.FechaInicio</p>
+                    <p><strong>Fecha Final: </strong>@reserva.FechaFinal</p>
+                    <p><strong>Capacidad de personas: </strong>@reserva.Habitacion.Capacidad</p>
+
+                    @* Mostrar artículos extras *@
+                    <strong>Artículos extras:</strong>
+                    <ul>
+                        @if (reserva.ReservasDetalles != null && reserva.ReservasDetalles.Any())
+                        {
+                            @foreach (var detalle in reserva.ReservasDetalles)
+                            {
+                                var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
+                                if (articuloExtra != null)
+                                {
+                                    <li>@articuloExtra.Descripcion</li>
+                                }
+                                else
+                                {
+                                    <li>Artículo extra no encontrado</li>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <li>No hay artículos extras asociados a esta reserva.</li>
+                        }
+                    </ul>
+
+                    <p><strong>Monto total: </strong>@reserva.Habitacion.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+
+                    @* Información del huésped *@
+                    <h5>Información del huésped</h5>
+                    <p><strong>Nombre y Apellido: </strong>@reserva.Clientes?.Nombres</p>
+                    <p><strong>Teléfono: </strong>@reserva.Clientes?.Telefono</p>
+                    <p><strong>Email: </strong>@reserva.Clientes?.Email</p>
+                    <p><strong>Cédula: </strong>@reserva.Clientes?.Cedula</p>
+                </div>
+            </div>
+        }
+    }
+</div>
 
 
 @code {
+    public Reservas Reservas { get; set; } = new Reservas();
+    public List<Reservas> ListaReservas { get; set; } = new List<Reservas>();
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
+    public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
+    public List<ArticulosExtras> ListaArticulosExtras { get; set; } = new List<ArticulosExtras>();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public List<Agregados> ListaAgregados { get; set; } = new List<Agregados>();
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
 
-}
+    protected override async Task OnInitializedAsync()
+    {
+        ListaReservas = await reservasService.Listar(r => true);
+        ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+} 
