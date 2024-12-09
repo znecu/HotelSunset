@@ -4,8 +4,8 @@
 Nuestro proyecto es una plataforma de gestión de reservas de habitaciones para el **Sunset Hotel**. Los usuarios pueden realizar reservas de habitaciones en función de la disponibilidad, añadir servicios adicionales y filtrar habitaciones según un rango de fechas específico. ¡Vamos a descubrir más sobre **Sunset Hotel**! 🚀
 
 ## 👥 **Integrantes:**
-- Alma María Marte
-- Franniel Arias Rodríguez
+- Alma María Marte (2022-0078)
+- Franniel Arias Rodríguez (2022-0025)
 
 ## 🌟 **Funcionalidades Principales:**
 
