@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace HotelSunset.Service;
 
-public class ArticulosExtrasSerive(IDbContextFactory<ApplicationDbContext> DbFactory)
+public class ArticulosExtrasService(IDbContextFactory<ApplicationDbContext> DbFactory)
 {
     public async Task<bool> Guardar(ArticulosExtras extras)
     {

@@ -8,10 +8,15 @@
     padding-right: 10px; 
     width: 80%;
     margin-left: 160px;
-    margin-top: 200px;
+    margin-top: 60px;
 
 }
-
+.container-principal h1 {
+    display: flex;
+    margin-top: 20px;
+    justify-content: start;
+    font-family: 'Times New Roman', Times, serif
+}
 .reserva-info {
     display: flex;
     flex-direction: row; 
@@ -139,4 +144,8 @@ ul {
     display: flex;
     flex-direction: column;
     gap: 5px; 
+}
+
+.card-body button{
+    color
 }

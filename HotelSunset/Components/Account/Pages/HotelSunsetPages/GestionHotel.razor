@@ -2,12 +2,15 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject ReservasService reservasService
-@inject ArticulosExtrasSerive articulosExtrasService
+@inject ArticulosExtrasService articulosExtrasService
 @inject NavigationManager navigationManager
 @inject ToastService toastService
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Gestión del Hotel</PageTitle>
+<div class="container-principal">
+    <h1>Reservas</h1>
+</div>
 <div class="card-body">
     <div class="row mb-4 align-items-end">
         @* Filtro por fechas *@
@@ -23,14 +26,12 @@
         </div>
         <div class="col-md-3 text-start">
             <button class="btn btn-outline-primary" @onclick="FiltrarPorFecha">
-                <i class="bi bi-search"></i>
+                <Icon Name="IconName.Search"></Icon>
             </button>
-        </div>
-
-        <div class="col-md-3 text-start">
             <button class="btn btn-outline-secondary ms-2" @onclick="Restablecer">
-                <i class="bi bi-arrow-counterclockwise"></i>
+                <Icon Name="IconName.ArrowClockwise"></Icon>
             </button>
+
         </div>
     </div>
     <div class="row">
