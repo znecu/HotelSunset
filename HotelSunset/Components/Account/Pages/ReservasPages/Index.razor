@@ -1,0 +1,179 @@
+﻿@page "/Reservas"
+@using System.Globalization
+@rendermode InteractiveServer
+@inject HabitacionesService habitacionesService
+@inject HabitacionesDetalleService habitacionesDetallesService
+@inject AgregadosService agregadosService
+@inject ReservasService reservasService
+@inject NavigationManager navigationManager
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+@inject ToastService toastService
+
+<PageTitle>Index</PageTitle>
+<EditForm Model="reservas" OnValidSubmit="FiltrarHabitaciones">
+    <DataAnnotationsValidator />
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Seleccionar alojamiento</h2>
+
+        @* Filtro por fechas *@
+        <div class="row mb-4 align-items-end">
+            <div class="col-md-3">
+                <label>Fecha de Inicio</label>
+                <InputDate @bind-Value="reservas.FechaInicio" class="form-control"
+                           min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label>Fecha Final</label>
+                <InputDate @bind-Value="reservas.FechaFinal" class="form-control"
+                           min="@reservas.FechaInicio?.AddDays(1).ToString("yyyy-MM-dd")" />
+            </div>
+            
+            <div class="col-md-3 text-start">
+                <button class="btn btn-outline-primary" @onclick="FiltrarHabitaciones">
+                    <Icon Name="IconName.Search"></Icon>
+                </button>
+                <button class="btn btn-outline-secondary ms-2" @onclick="Restablecer">
+                    <Icon Name="IconName.ArrowClockwise"></Icon>
+                </button>
+            </div>
+            <div class="col-md-3 text-start">
+                <a href="/Reservas/VerReserva">
+                    <button type="button" class="btn btn-outline-secondary">
+                        <Icon Name="IconName.CardList"></Icon> Mi reserva
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div class="habitaciones-container">
+            @if (ListaHabitaciones.Count == 0)
+            {
+                <div class="text-center">No hay habitaciones disponibles.</div>
+            }
+            else
+            {
+                @foreach (var habitacion in ListaHabitaciones)
+                {
+                    <div class="habitacion-card">
+
+                        @* Imagen de la habitación *@
+
+                        <div class="habitacion-image">
+                            @if (!string.IsNullOrEmpty(habitacion.ImagenUrl))
+                            {
+                                <img src="@habitacion.ImagenUrl" alt="Imagen de la habitación" />
+                            }
+                        </div>
+                        @*Detalles de la habitación *@
+                        <div class="habitacion-detalle">
+                            <h4>@habitacion.TipoHabitaciones?.Categoria</h4>
+                            <p>@habitacion.TipoHabitaciones?.Descripcion</p>
+                            <p><strong>Capacidad:</strong> @habitacion.Capacidad</p>
+
+                            @* Mostrar agregados *@
+                            <strong>Agregados:</strong>
+                            @if (habitacion.HabitacionDetalles != null && habitacion.HabitacionDetalles.Any())
+                            {
+                                @foreach (var detalle in habitacion.HabitacionDetalles)
+                                {
+                                    var agregado = ListaAgregados.FirstOrDefault(a => a.AgregadoId == detalle.AgregadoId);
+                                    if (agregado != null)
+                                    {
+                                        <span>@agregado.Descripcion</span>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <span>No hay agregados disponibles para esta habitación.</span>
+                            }
+                            <p><strong>Precio:</strong> @habitacion.PrecioBase.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</p>
+                            <button type="button" class="btn btn-outline-success" @onclick="() => IrCrearReserva(habitacion.HabitacionId)"> Reservar</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        @* Footer *@
+        <div class="footer mt-4">
+            <p><strong>Cantidad de habitaciones disponibles: </strong>@ListaHabitaciones.Count</p>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Reservas reservas { get; set; } = new Reservas();
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public HabitacionDetalle HabitacionDetalle { get; set; } = new HabitacionDetalle();
+    public List<HabitacionDetalle> ListaDetalle { get; set; } = new List<HabitacionDetalle>();
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public List<Agregados> ListaAgregados { get; set; } = new List<Agregados>();
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaHabitaciones = await habitacionesService.ListarConDetalles();
+        ListaAgregados = await agregadosService.Listar(a => true);
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    private async Task FiltrarHabitaciones()
+    {
+        if (reservas.FechaInicio.HasValue && reservas.FechaFinal.HasValue)
+        {
+            if (reservas.FechaInicio.Value.Date < DateTime.Now.Date)
+            {
+                return;
+            }
+
+            if (reservas.FechaFinal.Value.Date < reservas.FechaInicio.Value.Date)
+            {
+                return;
+            }
+
+            ListaHabitaciones = await habitacionesService.Listar(h =>
+                !h.Reservas.Any(r =>
+                    r.FechaInicio < reservas.FechaFinal.Value &&
+                    r.FechaFinal > reservas.FechaInicio.Value));
+        }
+
+        else
+        {
+            Notificacion(ToastType.Warning, "Hotel Sunset", "Por favor, seleccione ambas fechas");
+
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        ListaHabitaciones = await habitacionesService.ListarConDetalles();
+        reservas.FechaInicio = null;
+        reservas.FechaFinal = null;
+    }
+
+    private async Task IrCrearReserva(int habitacionId)
+    {
+        if (!reservas.FechaInicio.HasValue || !reservas.FechaFinal.HasValue)
+        {
+            Notificacion(ToastType.Warning, "Hotel Sunset", "Por favor, selecciona ambas fechas antes de continuar");
+            await Task.Delay(1500);
+            return;
+        }
+        navigationManager.NavigateTo($"/Reservas/Create/{habitacionId}/{reservas.FechaInicio:yyyy-MM-dd}/{reservas.FechaFinal:yyyy-MM-dd}");
+    }
+}

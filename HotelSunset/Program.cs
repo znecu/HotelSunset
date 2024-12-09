@@ -1,9 +1,12 @@
 using HotelSunset.Components;
 using HotelSunset.Components.Account;
 using HotelSunset.Data;
+using HotelSunset.Models;
+using HotelSunset.Service;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,17 +27,36 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+//Blob 
+var storageConnection = builder.Configuration["ConnectionStrings:HotelSunset:Storage"];
+
+builder.Services.AddAzureClients(azureBuilder => {
+    azureBuilder.AddBlobServiceClient(storageConnection);
+});
+
+builder.Services.AddBlazorBootstrap();
+builder.Services.AddScoped<AgregadosService>();
+builder.Services.AddScoped<ArticulosExtrasService>();
+builder.Services.AddScoped<ClientesService>();
+builder.Services.AddScoped<HabitacionesService>();
+builder.Services.AddScoped<HabitacionesDetalleService>();
+builder.Services.AddScoped<MetodoPagoService>();
+builder.Services.AddScoped<ReservasService>();
+builder.Services.AddScoped<ReservasDetalleService>();
+builder.Services.AddScoped<ServiciosService>();
+builder.Services.AddScoped<TipoHabitacionService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

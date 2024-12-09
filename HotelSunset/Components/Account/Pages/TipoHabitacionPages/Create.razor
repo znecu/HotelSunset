@@ -1,0 +1,100 @@
+﻿@page "/TipoHabitacion/Create"
+@rendermode InteractiveServer
+@layout EmptyLayout
+@inject TipoHabitacionService tipoHabitacionService
+@inject NavigationManager navigationManager
+@inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="TipoHabitaciones" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="shadow-lg">
+
+            @*Header*@
+            <div class="header text-center">
+                <h3><strong>Crear tipo de habitaci&oacute;n </strong></h3>
+
+            </div>
+
+            @*Body*@
+            <div class="card-body">
+
+                @*Categoria*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Categor&iacute;a</strong></label>
+                    <InputText class="form-control" @bind-Value="TipoHabitaciones.Categoria"></InputText>
+                    <ValidationMessage For="(()=> TipoHabitaciones.Categoria)" />
+                </div>
+
+                @*Descripcion*@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Descripci&oacute;n</strong></label>
+                    <InputText class="form-control" @bind-Value="TipoHabitaciones.Descripcion"></InputText>
+                    <ValidationMessage For="(()=> TipoHabitaciones.Descripcion)" />
+                </div>
+
+                @*Footer*@
+                <div class="footer text-center">
+                    <button type="button" class="btn btn-outline-primary" @onclick="() => Volver()"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
+                    <button type="submit" class="btn btn-outline-success"><Icon Name="IconName.Floppy"></Icon> Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+@code {
+    public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            Notificacion(ToastType.Warning, "Creación de tipo de habitación", "Ya existe un tipo de habitación con esta descripción ");
+            return;
+        }
+
+        var crear = await tipoHabitacionService.Guardar(TipoHabitaciones);
+
+        if (crear)
+        {
+            Notificacion(ToastType.Success, "Creación de tipo de habitación", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+        }
+
+        else
+        {
+            Notificacion(ToastType.Danger, "Creación de tipo de habitación", "No se pudo crear el tipo de habitación ");
+        }
+    }
+
+    private async Task<bool> Validar()
+    {
+        var existe = await tipoHabitacionService.ExisteTipoHabitacion(TipoHabitaciones.TipoHabitacionId, TipoHabitaciones.Categoria, TipoHabitaciones.Descripcion);
+        return existe;
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/TipoHabitacion");
+    }
+}

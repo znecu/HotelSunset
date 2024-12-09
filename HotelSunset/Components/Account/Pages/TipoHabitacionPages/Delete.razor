@@ -1,0 +1,86 @@
+﻿@page "/TipoHabitacion/Delete/{TipoHabitacionId:int}"
+@using System.Globalization
+@rendermode InteractiveServer
+@layout EmptyLayout
+@inject TipoHabitacionService tipoHabitacionService
+@inject NavigationManager navigationManager
+@inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Eliminar</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+
+        @*Header*@
+        <div class="header text-center">
+            <h3><strong>Eliminar tipo de habitaci&oacute;n</strong></h3>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="text-center mt-3">
+                <h5><strong>¿Está seguro de que desea eliminar este tipo de habitaci&oacute;n?</strong></h5>
+            </div>
+            <ul class="mt-4">
+                <li><strong>TipoHabitacionId: </strong>@TipoHabitaciones.TipoHabitacionId</li>
+                <li><strong>Categor&iacute;a: </strong>@TipoHabitaciones.Categoria</li>
+                <li><strong>Descripci&oacute;n: </strong>@TipoHabitaciones.Descripcion</li>
+
+            </ul>
+        </div>
+
+        @*Footer*@
+        <div class="footer text-end mt-3">
+            <button type="button" class="btn btn-outline-primary" @onclick="Volver"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
+            <button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><Icon Name="IconName.Trash"></Icon> Eliminar</button>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int TipoHabitacionId { get; set; }
+    public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        TipoHabitaciones = await tipoHabitacionService.Buscar(TipoHabitacionId);
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    private async Task Eliminar()
+    {
+        var Eliminar = await tipoHabitacionService.Eliminar(TipoHabitaciones);
+
+        if (Eliminar)
+        {
+            Notificacion(ToastType.Success, "Eliminación de tipo de habitación", "Se ha eliminado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+        }
+        else
+        {
+            Notificacion(ToastType.Danger, "Eliminación de tipo de habitación", "No se ha podido eliminar el tipo de habitación ");
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/TipoHabitacion");
+    }
+}
