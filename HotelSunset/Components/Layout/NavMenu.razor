@@ -14,9 +14,14 @@
         <li><a href="/Galeria">Galería</a></li>
         <li><a href="/Contactanos">Contáctanos</a></li>
         <li><a href="/Reservas">Reservas</a></li>
-         <AuthorizeView Roles="Admin">
-            <li><a href="/GestionHotel">Gesti&oacute;n del hotel</a></li>
-         </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <li><a href="/GestionHotel">Gesti&oacute;n del hotel</a></li>
+            </Authorized>
+        </AuthorizeView>
+
+
+
         <li><a href="/Account/Login">Iniciar sesi&oacute;n</a></li>
     </ul>
 </nav>
