@@ -8,7 +8,7 @@
 @inject MetodoPagoService metodoPagoService
 @inject ClientesService clientesService
 @inject ToastService toastService
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
@@ -169,6 +169,7 @@
                 </div>
                 <button type="submit" class="btn btn-outline-primary">Confirmar pago</button>
             </div>
+   
         </div>
 
         @* Modal *@
@@ -224,9 +225,12 @@
     public int CantidadNoches;
     public List<ToastMessage> Mensaje { get; set; } = [];
     public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
-
+    private bool IsAuthenticated { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        IsAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
         Habitaciones = await habitacionesService.Buscar(HabitacionId);
         if (Habitaciones != null)
         {
@@ -252,6 +256,13 @@
 
     public async Task Guardar()
     {
+        if (!IsAuthenticated)
+        {
+            Notificacion(ToastType.Warning, "Reserva", "Debes iniciar sesión para guardar la reserva.");
+            await Task.Delay(2000);
+            navigationManager.NavigateTo("/Account/Login");
+            return;
+        }
         Cliente.Reservas = Reservas;
         Cliente.Tarjeta = Tarjetas;
         var cliente = await clientesService.Guardar(Cliente);
