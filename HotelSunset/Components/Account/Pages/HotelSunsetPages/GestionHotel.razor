@@ -5,6 +5,7 @@
 @inject ArticulosExtrasService articulosExtrasService
 @inject NavigationManager navigationManager
 @inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
 <Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
 
 <PageTitle>Gestión del Hotel</PageTitle>
