@@ -3,7 +3,7 @@
 @layout AdminLayout
 @inject ArticulosExtrasService articulosExtraSerive
 @inject NavigationManager navigationManager
-
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Extras</PageTitle>
 <div class="container">
     <div class="shadow-lg">

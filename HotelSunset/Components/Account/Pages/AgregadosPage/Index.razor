@@ -6,7 +6,7 @@
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 @layout AdminLayout
-
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Agregar</PageTitle>
 <div class="container">
     <div class="shadow-lg">
