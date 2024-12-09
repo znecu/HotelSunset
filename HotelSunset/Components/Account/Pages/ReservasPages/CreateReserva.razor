@@ -1,0 +1,350 @@
+﻿@page "/Reservas/Create/{HabitacionId:int}/{FechaInicio}/{FechaFinal}"
+@using System.Globalization
+@inject HabitacionesService habitacionesService
+@inject ReservasService reservasServices
+@inject NavigationManager navigationManager
+@inject ArticulosExtrasService articulosExtrasService
+@inject TipoHabitacionService tipoHabitacionService
+@inject MetodoPagoService metodoPagoService
+@inject ClientesService clientesService
+@inject ToastService toastService
+
+@rendermode InteractiveServer
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Reservas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="main-container">
+        <h1>Finalizar reserva</h1>
+        <div class="container-volver">
+            <button type="button" class="bi-chevron-left" @onclick="Volver"></button>
+        </div>
+
+        <div class="habitacion-detalle-container">
+            <div class="habitacion-info">
+
+                @* Imagen *@
+                <div class="habitacion-image-inside">
+                    @if (!string.IsNullOrEmpty(Habitaciones?.ImagenUrl))
+                    {
+                        <img src="@Habitaciones.ImagenUrl" alt="Imagen de la habitación" class="img-fluid rounded shadow-sm" />
+                    }
+
+                </div>
+                <div class="habitacion-card">
+                    <strong>Tipo de habitación: </strong>@TipoHabitaciones.Categoria
+                    <br />
+                    <strong>Habitación: </strong>@Habitaciones.NumeroHabitacion
+                    <br />
+                    <strong>Fecha de Inicio: </strong>@Reservas.FechaInicio?.ToString("yyyy-MM-dd")
+                    <br />
+                    <strong>Fecha Final: </strong>@Reservas.FechaFinal?.ToString("yyyy-MM-dd")
+                    <br />
+                    <strong>Noches Transcurridas: </strong>@CantidadNoches
+                    <br />
+                    <strong>Capacidad de personas: </strong>@Habitaciones.Capacidad
+                    <br />
+                    <strong>Precio base: </strong>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))
+                </div>
+            </div>
+            @* Detalle *@
+            <div class="habitacion-detalle">
+                <h5><strong>Extras</strong></h5>
+                <div class="input-group align-items-center mt-2">
+                    <InputSelect class="form-select" @bind-Value=DetalleSeleccionado.ExtrasId>
+                        <option value="0" selected disabled>Seleccione un artículo extra</option>
+                        @foreach (var extra in ListaArticulosExtras)
+                        {
+                            <option value="@extra.ExtrasId">@extra.Descripcion (@extra.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US")))</option>
+                        }
+                    </InputSelect>
+                    <label class="col-form-label input-group-text">Cantidad:</label>
+                    <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
+                    <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle>Agregar</button>
+                </div>
+                @* Tabla *@
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Extra</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalle in Reservas.ReservasDetalles)
+                        {
+                            var articuloExtra = ListaArticulosExtras.FirstOrDefault(a => a.ExtrasId == detalle.ExtrasId);
+                            <tr>
+                                <td>@articuloExtra?.Descripcion</td>
+                                <td>@detalle.Cantidad</td>
+                                <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                <td>
+                                    <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-danger bi bi-trash" type="button">Remover</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @*MontoTotal*@
+            <div>
+                <label class="form-label">Monto Total</label>
+                <InputNumber class="form-control" @bind-Value="Reservas.Total" ReadOnly="true"></InputNumber>
+                <ValidationMessage For="(()=> Reservas.Total)" />
+            </div>
+        </div>
+
+        <div class="info-metodo-container">
+            @*Información del huésped*@
+            <div class="container-info">
+                <h4>Información del huésped</h4>
+                @* Nombre *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Nombre y apellido</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
+                    <ValidationMessage For="(() => Cliente.Nombres)" />
+                </div>
+                @* Telefono *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Teléfono</strong></label>
+                    <InputText class="form-control" placeholder="Ej: 809-1231456" @bind-Value="Cliente.Telefono"></InputText>
+                    <ValidationMessage For="(() => Cliente.Telefono)" />
+                </div>
+                @* Email *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Email</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Email"></InputText>
+                    <ValidationMessage For="(() => Cliente.Email)" />
+                </div>
+                @* Cedula *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Cédula</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Cedula"></InputText>
+                    <ValidationMessage For="(() => Cliente.Cedula)" />
+                </div>
+            </div>
+
+            @*Método de pago*@
+            <div class="container-metodopago">
+                <h4>Método de pago</h4>
+
+                @*InputSelectMetodoPago*@
+                <div class="col mt-2">
+                    <label class="form-label"><strong>M&eacute;todo de pago</strong></label>
+                    <InputSelect class="form-select" @bind-Value="MetodoPago.MetodoPagoId">
+                        <option value="0" selected disabled>Seleccione un m&eacute;todo de pago</option>
+                        @foreach (var pago in ListaMetodoPago)
+                        {
+                            <option value="@pago.MetodoPagoId">@pago.Descripcion</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                @* Nombre *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Nombre y apellido</strong></label>
+                    <InputText class="form-control" @bind-Value="Tarjetas.NombresApellido"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.NombresApellido)" />
+                </div>
+                @* NumeroTarjeta *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Número de tarjeta</strong></label>
+                    <InputText class="form-control" @bind-Value="Tarjetas.NumeroTarjeta"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.NumeroTarjeta)" />
+                </div>
+                @* FechaExpiracion *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>Fecha de expiración</strong></label>
+                    <InputText class="form-control" placeholder="Ej: 04/2024" @bind-Value="Tarjetas.FechaExpiracion"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.FechaExpiracion)" />
+                </div>
+                @* CVV *@
+                <div class="col-2 mt-2">
+                    <label class="form-label"><strong>CVC</strong></label>
+                    <InputText class="form-control" @bind-Value="Tarjetas.CodigoSeguridad"></InputText>
+                    <ValidationMessage For="(() => Tarjetas.CodigoSeguridad)" />
+                </div>
+                <button type="submit" class="btn btn-outline-primary">Confirmar pago</button>
+            </div>
+        </div>
+
+        @* Modal *@
+        <Modal @ref="modal" title="Hotel Sunset" IsVerticallyCentered="true">
+            <BodyTemplate>
+                <Icon Name="IconName.CreditCard"></Icon>
+                Pago realizado con éxito.
+            </BodyTemplate>
+            <FooterTemplate>
+                <a href="/Reservas/VerReserva" >
+                     <button class="btn btn-outline-primary">Ver reserva</button>
+                </a>
+            </FooterTemplate>
+        </Modal>
+
+        @* Footer *@
+        <div class="card-footer mt-5">
+            <div class="text-center">
+                <h4>© Hotel Sunset | Todos los derechos reservados. </h4>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int HabitacionId { get; set; }
+    [Parameter]
+    public string FechaInicio { get; set; } = string.Empty;
+    [Parameter]
+    public string FechaFinal { get; set; } = string.Empty;
+
+    public ArticulosExtras ArticulosExtras { get; set; } = new ArticulosExtras();
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public Reservas Reservas { get; set; } = new Reservas();
+    public ReservasDetalle DetalleSeleccionado { get; set; } = new ReservasDetalle();
+    public List<ReservasDetalle> ListaReservaDetalle { get; set; } = new List<ReservasDetalle>();
+    public List<ArticulosExtras> ListaArticulosExtras { get; set; } = new List<ArticulosExtras>();
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new List<Habitaciones>();
+    public List<Reservas> ListaReservas { get; set; } = new List<Reservas>();
+
+    public List<MetodoPago> ListaMetodoPago { get; set; } = new List<MetodoPago>();
+    public MetodoPago MetodoPago { get; set; } = new MetodoPago();
+
+    public TipoHabitaciones TipoHabitaciones { get; set; } = new TipoHabitaciones();
+
+    public Tarjetas Tarjetas { get; set; } = new Tarjetas();
+
+    public Clientes Cliente { get; set; } = new Clientes();
+
+    public TimeSpan NochesTranscurridas => Reservas.FechaFinal.Value - Reservas.FechaInicio.Value;
+
+    public int CantidadNoches;
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    protected override async Task OnInitializedAsync()
+    {
+        Habitaciones = await habitacionesService.Buscar(HabitacionId);
+        if (Habitaciones != null)
+        {
+            Reservas.HabitacionId = HabitacionId;
+        }
+
+        if (!string.IsNullOrEmpty(FechaInicio) && !string.IsNullOrEmpty(FechaFinal))
+        {
+            Reservas.FechaInicio = DateTime.ParseExact(FechaInicio, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            Reservas.FechaFinal = DateTime.ParseExact(FechaFinal, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        }
+
+        ListaArticulosExtras = await articulosExtrasService.Listar(a => true);
+        TipoHabitaciones = await tipoHabitacionService.Buscar(Habitaciones.TipoHabitacionId);
+        ListaMetodoPago = await metodoPagoService.Listar(m => true);
+
+        CantidadNoches = (Reservas.FechaFinal - Reservas.FechaInicio)?.Days ?? 0;
+        Habitaciones.MontoTotal *= CantidadNoches;
+        Reservas.Total = Habitaciones.MontoTotal;
+
+    }
+
+    public async Task Guardar()
+    {
+        Cliente.Reservas = Reservas;
+        Cliente.Tarjeta = Tarjetas;
+        var cliente = await clientesService.Guardar(Cliente);
+        var reserva = await reservasServices.Guardar(Reservas);
+
+        if (reserva && cliente)
+        {
+            await modal.ShowAsync();
+            Notificacion(ToastType.Success, "Reserva", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+        }
+
+        else
+        {
+            Notificacion(ToastType.Success, "Reserva", "No se podido crear la reserva ");
+            await Task.Delay(1500);
+        }
+
+    }
+
+    public void AgregarDetalle()
+    {
+
+        if (DetalleSeleccionado.ExtrasId == 0 || DetalleSeleccionado.Cantidad <= 0)
+        {
+            return;
+        }
+
+        var extrasSeleccionado = ListaArticulosExtras.FirstOrDefault(e => e.ExtrasId == DetalleSeleccionado.ExtrasId);
+
+        if (extrasSeleccionado != null)
+        {
+            var precioTotal = extrasSeleccionado.Precio * DetalleSeleccionado.Cantidad;
+
+            Reservas.ReservasDetalles.Add(new ReservasDetalle
+                {
+                    ExtrasId = extrasSeleccionado.ExtrasId,
+                    Precio = precioTotal,
+                    Cantidad = DetalleSeleccionado.Cantidad
+
+                });
+
+            Reservas.Total = Habitaciones.MontoTotal + precioTotal;
+            foreach (var detalle in Reservas.ReservasDetalles)
+            {
+                Reservas.Total += detalle.Precio;
+            }
+
+            DetalleSeleccionado = new ReservasDetalle();
+        }
+    }
+
+    public void RemoverDetalle(ReservasDetalle eliminarDetalle)
+    {
+        Reservas.ReservasDetalles.Remove(eliminarDetalle);
+
+        DetalleSeleccionado.ExtrasId = eliminarDetalle.ExtrasId;
+        DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;
+        Reservas.Total = Habitaciones.MontoTotal;
+
+        foreach (var detalle in Reservas.ReservasDetalles)
+        {
+            Reservas.Total += detalle.Precio;
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/Reservas");
+    }
+
+    private Modal modal = default!;
+
+    public async Task OnShowModalClick()
+    {
+        await modal.ShowAsync();
+    }
+
+    public async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+}

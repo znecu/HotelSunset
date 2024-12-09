@@ -1,0 +1,75 @@
+﻿@page "/GestionHotel/Agregados"
+@using HotelSunset.Models
+@using HotelSunset.Service
+@using System.Globalization
+@inject AgregadosService agregadoService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@layout AdminLayout
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Agregar</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+        @*Header*@
+        <div class="header">
+            <h1><strong>Agregados</strong></h1>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            @*Crear*@
+            <div class="col text-end">
+                <a href="Agregados/Create"><button type="button" class="btn btn-outline-success bi bi-person-plus-fill"> Crear</button></a>
+            </div>
+            @*Tabla*@
+            <table class="table table-bordered text-center mt-5">
+                <thead>
+                    <tr>
+                        <th>AgregarId</th>
+                        <th>Descripcion</th>
+                        <th>Precio</th>
+                        <th>Existencia</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var agregados in ListaAgregado)
+                    {
+                        <tr>
+                            <td>@agregados.AgregadoId</td>
+                            <td>@agregados.Descripcion</td>
+                            <td>@agregados.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            <td>@agregados.Existencia</td>
+                            @*Editar*@
+                            <td>
+                                <a href="Agregados/Edit/@agregados.AgregadoId">
+                                    <button type="button" class="btn btn-outline-warning bi bi-pencil"></button>
+                                </a>
+                            </td>
+                            @*Eliminar*@
+                            <td>
+                                <a href="Agregados/Eliminar/@agregados.AgregadoId">
+                                    <button type="button" class="btn btn-outline-danger bi bi-trash"></button>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @*Footer*@
+        <div class="footer">
+            <p><strong>Cantidad de agregados :</strong> @ListaAgregado.Count</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    public Agregados agregados { get; set; } = new Agregados();
+    public List<Agregados> ListaAgregado { get; set; } = new List<Agregados>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaAgregado = await agregadoService.Listar(a => true);
+    }
+}

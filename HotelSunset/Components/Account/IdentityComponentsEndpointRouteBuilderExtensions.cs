@@ -19,26 +19,7 @@ namespace Microsoft.AspNetCore.Routing
         {
             ArgumentNullException.ThrowIfNull(endpoints);
 
-            var accountGroup = endpoints.MapGroup("/Account");
-
-            accountGroup.MapPost("/PerformExternalLogin", (
-                HttpContext context,
-                [FromServices] SignInManager<ApplicationUser> signInManager,
-                [FromForm] string provider,
-                [FromForm] string returnUrl) =>
-            {
-                IEnumerable<KeyValuePair<string, StringValues>> query = [
-                    new("ReturnUrl", returnUrl),
-                    new("Action", ExternalLogin.LoginCallbackAction)];
-
-                var redirectUrl = UriHelper.BuildRelative(
-                    context.Request.PathBase,
-                    "/Account/ExternalLogin",
-                    QueryString.Create(query));
-
-                var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-                return TypedResults.Challenge(properties, [provider]);
-            });
+            var accountGroup = endpoints.MapGroup("/Account");         
 
             accountGroup.MapPost("/Logout", async (
                 ClaimsPrincipal user,

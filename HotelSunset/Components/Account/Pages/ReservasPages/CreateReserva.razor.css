@@ -1,0 +1,142 @@
+﻿
+.container-volver {
+    display: flex;
+    align-items: center; 
+    position: absolute; 
+    left: 60px; 
+    top: 108px;
+}
+
+.main-container h1 {
+    font-size: 30px;
+    margin-left: 110px; 
+    margin-top: 20px;
+}
+
+
+.container-volver button {
+    background: none; 
+    border: none; 
+    padding: 0; 
+    cursor: pointer; 
+    font-size: 30px; 
+    color: #000; 
+    transition: color 0.3s ease; 
+}
+
+
+.habitacion-detalle-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 60%;
+    margin-left: 20%;
+}
+
+.habitacion-info {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    max-width: 100%;
+}
+
+.habitacion-image-inside {
+    width: 30%;
+    height: auto;
+    max-height: 100px;
+}
+
+    .habitacion-image-inside img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+.habitacion-card {
+    flex: 1;
+}
+
+.habitacion-detalle {
+    width: 100%;
+    margin-top: 30px;
+}
+
+
+.container-info,
+.container-metodopago {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-left: 20%;
+    margin-top: 1%;
+}
+
+    .container-metodopago button {
+        padding: 10px 20px;
+        background-color: #808080;
+        width: 280px;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+    }
+
+        .container-metodopago button:hover {
+            background-color: #555;
+        }
+
+.card-footer {
+    background-color: #b6a579;
+    color: white;
+    padding: 40px;
+    height: 200px;
+    width: 1864px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+    .card-footer p {
+        margin: 0;
+    }
+
+.text-center h4 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    line-height: 1.8;
+}
+
+.info-metodo-container {
+    display: flex;
+    gap: 30px; 
+    margin-top: 20px;
+}
+
+.container-metodopago {
+    max-width: 45%;
+}
+
+    .container-info .col-2,
+    .container-metodopago .col-2 {
+        flex: 1; 
+        min-width: 280px; 
+        margin-bottom: 15px; 
+    }
+
+@media (max-width: 768px) {
+    .info-metodo-container {
+        flex-direction: column; 
+    }
+
+    .container-info, .container-metodopago {
+        max-width: 100%;
+    }
+}

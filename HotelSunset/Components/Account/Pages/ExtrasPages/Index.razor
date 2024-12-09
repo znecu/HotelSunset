@@ -1,0 +1,81 @@
+﻿@page "/GestionHotel/Extras"
+@using System.Globalization
+@layout AdminLayout
+@inject ArticulosExtrasService articulosExtraSerive
+@inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Extras</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+
+        @*Header*@
+        <div class="header">
+            <h1><strong>Extras</strong></h1>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="row">
+
+                @*Crear*@
+                <div class="col text-end">
+                    <a href="/Extras/Create">
+                        <button type="button" class="btn btn-outline-success bi bi-person-plus-fill"> Crear</button>
+                    </a>
+                </div>
+
+                @*Tabla*@
+                <table class="table table-bordered text-center mt-5">
+                    <thead>
+                        <tr>
+                            <th>ExtrasId</th>
+                            <th>Descripcion</th>
+                            <th>Precio</th>
+                            <th>Existencia</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var articulos in ListaArticulosExtras)
+                        {
+                            <tr>
+                                <td>@articulos.ExtrasId</td>
+                                <td>@articulos.Descripcion</td>
+                                <td>@articulos.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                <td>@articulos.Existencia</td>
+
+                                @*Editar*@
+                                <td>
+                                    <a href="Extras/Edit/@articulos.ExtrasId">
+                                        <button type="button" class="btn btn-outline-warning bi bi-pencil"></button>
+                                    </a>
+                                </td>
+                                @*Eliminar*@
+                                <td>
+                                    <a href="Extras/Delete/@articulos.ExtrasId">
+                                        <button type="button" class="btn btn-outline-danger bi bi-trash"></button>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Cantidad de articulos extras:</strong> @ListaArticulosExtras.Count</p>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public List<ArticulosExtras> ListaArticulosExtras { get; set; } = new List<ArticulosExtras>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaArticulosExtras = await articulosExtraSerive.Listar(a => a.ExtrasId > 0);
+    }
+}

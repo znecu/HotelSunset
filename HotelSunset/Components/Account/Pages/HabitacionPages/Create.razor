@@ -1,0 +1,253 @@
+﻿@page "/CrearHabitacion/Create"
+@layout EmptyLayout
+@inject HabitacionesService habitacionesService
+@inject TipoHabitacionService tipoHabitacionService
+@inject HabitacionesDetalleService habitacionDetalleService
+@inject AgregadosService agregadosService
+@inject BlobServiceClient blobService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Habitaciones" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="shadow-lg">
+
+            @*Header*@
+            <div class="header text-center">
+                <h3><strong>Crear habitación</strong></h3>
+            </div>
+
+            @*Body*@
+            <div class="card-body">
+
+                @*TipoHabitacion*@
+                <div>
+                    <label class="form-label">Tipo de Habitación</label>
+                    <InputSelect class="form-select" @bind-Value="Habitaciones.TipoHabitacionId">
+                        <option value="0" disabled>Seleccione un tipo</option>
+                        @foreach (var tipo in ListaTipoHabitaciones)
+                        {
+                            <option value="@tipo.TipoHabitacionId">@tipo.Categoria</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                @*NumeroHabitacion*@
+                <div>
+                    <label class="form-label">Número de habitación</label>
+                    <InputText class="form-control" placeholder="Ej: A-302" @bind-Value="Habitaciones.NumeroHabitacion"></InputText>
+                    <ValidationMessage For="(()=> Habitaciones.NumeroHabitacion)" />
+                </div>
+
+                @*PrecioBase*@
+                <div>
+                    <label class="form-label">Precio Base</label>
+                    <InputNumber class="form-control" @bind-Value="Habitaciones.PrecioBase"></InputNumber>
+                    <ValidationMessage For="(()=> Habitaciones.PrecioBase)" />
+                </div>
+
+                @*Capacidad*@
+                <div>
+                    <label class="form-label">Capacidad</label>
+                    <InputNumber class="form-control" @bind-Value="Habitaciones.Capacidad"></InputNumber>
+                    <ValidationMessage For="(()=> Habitaciones.Capacidad)" />
+                </div>
+
+                @*Imagen*@
+                <div class="col-6">
+                    <label class="form-label" for="imagenUrl"><strong>Seleccione la Imagen del Producto</strong></label>
+                    <InputFile OnChange="CargarImagen" />
+                    <ValidationMessage For="@(() => Habitaciones.ImagenUrl)" />
+                </div>
+
+                @*Detalle*@
+                <div class="border border-success p-3 mt-3">
+                    <h5>Detalle de Agregados</h5>
+                    <div class="input-group align-items-center mt-2">
+                        <InputSelect class="form-select" @bind-Value="DetalleSeleccionado.AgregadoId">
+                            <option value="0" selected disabled>Seleccione un agregado</option>
+                            @foreach (var agregado in ListaAgregados)
+                            {
+                                <option value="@agregado.AgregadoId">@agregado.Descripcion (@agregado.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US")))</option>
+                            }
+                        </InputSelect>
+
+                        <label class="col-form-label input-group-text">Cantidad:</label>
+                        <InputNumber class="form-control" @bind-Value="DetalleSeleccionado.Cantidad"></InputNumber>
+
+                        <button type="button" class="btn btn-outline-success bi bi-plus" @onclick=AgregarDetalle> Agregar</button>
+                    </div>
+
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr>
+                                <th>Agregados</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in Habitaciones.HabitacionDetalles)
+                            {
+                                var agregados = ListaAgregados.FirstOrDefault(a => a.AgregadoId == detalle.AgregadoId);
+                                <tr>
+                                    <td>@agregados.Descripcion</td>
+                                    <td>@detalle.Cantidad</td>
+                                    <td>@detalle.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                                    <td>
+                                        <button @onclick="@(() => RemoverDetalle(detalle))" class="btn btn-outline-danger bi bi-trash" type="button"> Remover</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @*MontoTotal*@
+                <div>
+                    <label class="form-label"><strong>Monto Total</strong></label>
+                    <label class="form-control" readonly>@Habitaciones.MontoTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</label>
+                </div>
+            </div>
+
+            @*Footer*@
+            <div class="footer">
+                <button type="button" class="btn btn-outline-primary" @onclick="() => Volver()"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
+                <button type="submit" class="btn btn-outline-success"><Icon Name="IconName.Floppy"></Icon> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Habitaciones Habitaciones { get; set; } = new Habitaciones();
+    public Agregados Agregados { get; set; } = new Agregados();
+    public Reservas Reservas { get; set; } = new Reservas();
+    public HabitacionDetalle DetalleSeleccionado { get; set; } = new HabitacionDetalle();
+    public List<TipoHabitaciones> ListaTipoHabitaciones { get; set; } = new();
+    public List<HabitacionDetalle> ListaHabitacionDetalle { get; set; } = new();
+    public List<Agregados> ListaAgregados { get; set; } = new();
+    public List<Habitaciones> ListaHabitaciones { get; set; } = new();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTipoHabitaciones = await tipoHabitacionService.Listar(t => true);
+        ListaHabitaciones = await habitacionesService.Listar(t => true);
+        ListaAgregados = await agregadosService.Listar(t => true);
+        ListaAgregados = await agregadosService.Listar(t => true);
+        ListaHabitacionDetalle = await habitacionDetalleService.Listar(t => true);
+        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    public async Task Guardar()
+    {
+
+        var crear = await habitacionesService.Guardar(Habitaciones);
+        if (crear)
+        {
+            Notificacion(ToastType.Success, "Creación de habitación", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+        }
+
+        else
+        {
+            Notificacion(ToastType.Danger, "Creación de habitación", "No se pudo crear la habitación ");
+        }
+    }
+
+    public void AgregarDetalle()
+    {
+        if (DetalleSeleccionado.AgregadoId == 0 || DetalleSeleccionado.Cantidad <= 0)
+        {
+            return;
+        }
+
+        var agregadoSeleccionado = ListaAgregados.FirstOrDefault(a => a.AgregadoId == DetalleSeleccionado.AgregadoId);
+
+        if (agregadoSeleccionado != null)
+        {
+            var precioTotal = agregadoSeleccionado.Precio * DetalleSeleccionado.Cantidad;
+
+            Habitaciones.HabitacionDetalles.Add(new HabitacionDetalle
+                {
+                    AgregadoId = agregadoSeleccionado.AgregadoId,
+                    Precio = precioTotal,
+                    Cantidad = DetalleSeleccionado.Cantidad
+                });
+
+            Habitaciones.MontoTotal = Habitaciones.PrecioBase;
+            foreach (var detalle in Habitaciones.HabitacionDetalles)
+            {
+                Habitaciones.MontoTotal += detalle.Precio;
+            }
+
+            DetalleSeleccionado = new HabitacionDetalle();
+        }
+    }
+
+    public void RemoverDetalle(HabitacionDetalle eliminarDetalle)
+    {
+        Habitaciones.HabitacionDetalles.Remove(eliminarDetalle);
+        DetalleSeleccionado.AgregadoId = eliminarDetalle.AgregadoId;
+        DetalleSeleccionado.Cantidad = eliminarDetalle.Cantidad;
+        Habitaciones.MontoTotal = Habitaciones.PrecioBase;
+
+        foreach (var detalle in Habitaciones.HabitacionDetalles)
+        {
+            Habitaciones.MontoTotal += detalle.Precio;
+        }
+
+        // DetalleSeleccionado = new HabitacionDetalle();
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/CrearHabitacion");
+    }
+
+    private async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var imageFile = e.File;
+
+            if (imageFile != null)
+            {
+                var containerClient = blobService.GetBlobContainerClient("imagenes");
+                var blobClient = containerClient.GetBlobClient(imageFile.Name);
+
+                await using var stream = imageFile.OpenReadStream();
+                await blobClient.UploadAsync(stream, true);
+
+                Habitaciones.ImagenUrl = blobClient.Uri.ToString();
+
+                Console.WriteLine($"URL de la imagen: {Habitaciones.ImagenUrl}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Notificacion(ToastType.Danger, "Error al cargar imagen", ex.Message);
+        }
+    }
+}

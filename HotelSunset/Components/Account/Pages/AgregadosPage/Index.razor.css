@@ -1,0 +1,45 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 700px;
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.shadow-lg {
+    width: 100%;
+    max-width: 1200px;
+    background-color: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.header {
+    border-bottom: 1px solid #000;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+.footer {
+    text-align: left;
+    margin-top: 20px;
+    font-size: 16px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}

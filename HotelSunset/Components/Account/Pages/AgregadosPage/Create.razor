@@ -1,0 +1,105 @@
+﻿@page "/Agregados/Create"
+@using HotelSunset.Models
+@using HotelSunset.Service
+@inject AgregadosService agregadoService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<EditForm Model="agregados" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="shadow-lg">
+            @*Header*@
+            <div class="header text-center">
+                <h3><strong>Crear Agregados</strong></h3>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                @*Descripcion*@
+                <div class="col-1 mt-2">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputText class="form-control" @bind-Value=agregados.Descripcion></InputText>
+                    <ValidationMessage For="(() => agregados.Descripcion)"></ValidationMessage>
+                </div>
+
+                @*Precio*@
+                <div class="col-1 mt-2">
+                    <label class="form-label"><strong>Precio</strong></label>
+                    <InputNumber class="form-control" @bind-Value=agregados.Precio></InputNumber>
+                    <ValidationMessage For="(() => agregados.Precio)"></ValidationMessage>
+                </div>
+
+                @*Existencia*@
+                <div class="col-1 mt-2">
+                    <label class="form-label"><strong>Existencia</strong></label>
+                    <InputNumber class="form-control" @bind-Value=agregados.Existencia></InputNumber>
+                    <ValidationMessage For="(() => agregados.Existencia)"></ValidationMessage>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="footer">
+                <a href="GestionHotel/Agregados">
+                    <button type="button" class="btn btn-outline-primary"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
+                </a>
+                <button type="submit" class="btn btn-outline-success"><Icon Name="IconName.Floppy"></Icon> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Agregados agregados { get; set; } = new Agregados();
+    public List<Agregados> ListaAgregado { get; set; } = new List<Agregados>();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    public async Task<bool> Validar()
+    {
+        var existe = await agregadoService.ExisteAgregados(agregados.AgregadoId, agregados.Descripcion);
+        return existe;
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            Notificacion(ToastType.Warning, "Creación de agregado", "Ya existe un agregado con esta descripción ");
+            return;
+        }
+
+        var crear = await agregadoService.Guardar(agregados);
+
+        if (crear)
+        {
+            Notificacion(ToastType.Success, "Creación de agregado", "Se ha creado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+
+        }
+        else
+        {
+            Notificacion(ToastType.Danger, "Creación de agregado", "No se pudo crear el agregado ");
+        }
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/Agregados");
+    }
+}

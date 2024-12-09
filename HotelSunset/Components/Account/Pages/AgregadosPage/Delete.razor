@@ -1,0 +1,88 @@
+﻿@page "/Agregados/Eliminar/{AgregadoId:int}"
+@using HotelSunset.Models
+@using HotelSunset.Service
+@using System.Globalization
+@inject AgregadosService agregadosService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@inject ToastService toastService
+@attribute [Authorize(Roles = "Admin")]
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Eliminar Agregado</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+        @*Header*@
+        <div class="card-header">
+            <div class="text-center">
+                <h2><strong>Eliminar Agregado</strong></h2>
+            </div>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            <div class="text-center mt-3">
+                <h5><strong>¿Está seguro de que desea eliminar este artículo extra?</strong></h5>
+            </div>
+            <ul class="mt-4">
+                <li><strong>AgregadoId: </strong>@Agregados.AgregadoId</li>
+                <li><strong>Descripción: </strong>@Agregados.Descripcion</li>
+                <li><strong>Precio: </strong>@Agregados.Precio.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))</li>
+                <li><strong>Cantidad: </strong>@Agregados.Existencia</li>
+            </ul>
+        </div>
+        @*Footer*@
+        <div class="footer text-end mt-3">
+            <a href="GestionHotel/Agregados">
+                <button type="button" class="btn btn-outline-primary"><Icon Name="IconName.Arrow90DegLeft"></Icon> Volver</button>
+            </a>
+            <button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><Icon Name="IconName.Trash"></Icon>Eliminar</button>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int AgregadoId { get; set; }
+    public Agregados Agregados { get; set; } = new Agregados();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+    public void Notificacion(ToastType toastType, string title, string message) => Mensaje.Add(ShowToast(toastType, title, message));
+
+    protected override async Task OnInitializedAsync()
+    {
+        Agregados = await agregadosService.Buscar(AgregadoId);
+    }
+
+    private ToastMessage ShowToast(ToastType toastType, string title, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = title,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    public async Task Eliminar()
+    {
+        var eliminar = await agregadosService.Eliminar(Agregados);
+
+        if (eliminar)
+        {
+            Notificacion(ToastType.Success, "Eliminación de agregados", "Se ha eliminado correctamente ");
+            await Task.Delay(1500);
+            Volver();
+        }
+        else
+        {
+            Notificacion(ToastType.Danger, "Eliminación de agregados", "No se ha podido eliminar el agregado ");
+        }
+    }
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/GestionHotel/Agregados");
+    }
+}

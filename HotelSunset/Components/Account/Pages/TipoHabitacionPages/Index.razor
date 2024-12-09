@@ -1,0 +1,78 @@
+﻿@page "/GestionHotel/TipoHabitacion"
+@using System.Globalization
+@layout AdminLayout
+@inject TipoHabitacionService tipoHabitacionService
+@inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>TipoHabitacion</PageTitle>
+<div class="container">
+    <div class="shadow-lg">
+
+        @*Header*@
+        <div class="header">
+            <h1><strong>Tipo de habitaci&oacute;n</strong></h1>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            <div class="row">
+
+                @*Create*@
+                <div class="col text-end">
+                    <a href="/TipoHabitacion/Create">
+                        <button type="button" class="btn btn-outline-success bi bi-person-plus-fill"> Crear</button>
+                    </a>
+                </div>
+
+                @*Tabla*@
+                <table class="table table-bordered text-center mt-5">
+                    <thead>
+                        <tr>
+                            <th>TipoHabitacionId</th>
+                            <th>Categor&iacute;a</th>
+                            <th>Descripci&oacute;n</th>
+                            <th>Editar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tipohabitacion in ListaTipoHabitaciones)
+                        {
+                            <tr>
+                                <td>@tipohabitacion.TipoHabitacionId</td>
+                                <td>@tipohabitacion.Categoria</td>
+                                <td>@tipohabitacion.Descripcion</td>
+
+
+                                @*Editar*@
+                                <td>
+                                    <a href="TipoHabitacion/Edit/@tipohabitacion.TipoHabitacionId">
+                                        <button type="button" class="btn btn-outline-warning bi bi-pencil"></button>
+                                    </a>
+                                </td>
+                                @*Eliminar*@
+                                <td>
+                                    <a href="TipoHabitacion/Delete/@tipohabitacion.TipoHabitacionId">
+                                        <button type="button" class="btn btn-outline-danger bi bi-trash"></button>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Cantidad de tipo de habitaciones:</strong> @ListaTipoHabitaciones.Count</p>
+        </div>
+    </div>
+</div>
+@code {
+    public List<TipoHabitaciones> ListaTipoHabitaciones { get; set; } = new List<TipoHabitaciones>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTipoHabitaciones = await tipoHabitacionService.Listar(t => t.TipoHabitacionId > 0);
+    }
+}
