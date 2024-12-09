@@ -46,8 +46,8 @@ builder.Services.AddAzureClients(azureBuilder => {
 });
 
 builder.Services.AddBlazorBootstrap();
-builder.Services.AddScoped<AgregadosServices>();
-builder.Services.AddScoped<ArticulosExtrasSerive>();
+builder.Services.AddScoped<AgregadosService>();
+builder.Services.AddScoped<ArticulosExtrasService>();
 builder.Services.AddScoped<ClientesService>();
 builder.Services.AddScoped<HabitacionesService>();
 builder.Services.AddScoped<HabitacionesDetalleService>();

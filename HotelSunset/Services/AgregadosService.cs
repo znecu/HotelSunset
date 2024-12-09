@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace HotelSunset.Service;
 
-public class AgregadosServices(IDbContextFactory<ApplicationDbContext> DbFactory)
+public class AgregadosService(IDbContextFactory<ApplicationDbContext> DbFactory)
 {
     public async Task<bool> Guardar(Agregados agregados)
     {

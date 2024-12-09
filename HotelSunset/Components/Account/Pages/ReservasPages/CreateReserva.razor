@@ -3,7 +3,7 @@
 @inject HabitacionesService habitacionesService
 @inject ReservasService reservasServices
 @inject NavigationManager navigationManager
-@inject ArticulosExtrasSerive articulosExtrasService
+@inject ArticulosExtrasService articulosExtrasService
 @inject TipoHabitacionService tipoHabitacionService
 @inject MetodoPagoService metodoPagoService
 @inject ClientesService clientesService
@@ -178,7 +178,9 @@
                 Pago realizado con éxito.
             </BodyTemplate>
             <FooterTemplate>
-                <Button Color="ButtonColor.Primary">Guardar</Button>
+                <a href="/Reservas/VerReserva" >
+                     <button Color="ButtonColor.Primary">Ver reserva</button>
+                </a>
             </FooterTemplate>
         </Modal>
 
@@ -313,7 +315,7 @@
         foreach (var detalle in Reservas.ReservasDetalles)
         {
             Reservas.Total += detalle.Precio;
-        }        
+        }
     }
 
     public void Volver()
