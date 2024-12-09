@@ -4,6 +4,7 @@
 @inject HabitacionesService habitacionesService
 @inject TipoHabitacionService tipoHabitacionService
 @inject NavigationManager navigationManager
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Index</PageTitle>
 <div class="container">

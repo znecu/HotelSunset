@@ -3,7 +3,7 @@
 @layout AdminLayout
 @inject TipoHabitacionService tipoHabitacionService
 @inject NavigationManager navigationManager
-
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>TipoHabitacion</PageTitle>
 <div class="container">
     <div class="shadow-lg">
